@@ -1,0 +1,5 @@
+<resources>
+    <string name="title_activity_editor_main">Fx Editor</string>
+    <string name="action_settings" translatable="false">Settings</string>
+
+</resources>

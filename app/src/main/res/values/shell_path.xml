@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="shell_path">
+        <item>/sbin</item>
+        <item>/vendor/bin</item>
+        <item>/system/sbin</item>
+        <item>/system/bin</item>
+        <item>/system/xbin</item>
+    </string-array>
+</resources>

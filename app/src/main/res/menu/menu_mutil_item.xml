@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_delete"
+        android:icon="@drawable/ic_action_discard"
+        android:orderInCategory="100"
+        android:title="@string/action_delete"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_zip"
+        android:orderInCategory="120"
+        android:title="@string/action_compress"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_copy"
+        android:icon="@drawable/ic_action_copy"
+        android:orderInCategory="130"
+        android:title="@string/action_copy"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_cut"
+        android:icon="@drawable/ic_action_cut"
+        android:orderInCategory="140"
+        android:title="@string/action_cut"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_select_all"
+        android:icon="@drawable/ic_action_select_all"
+        android:orderInCategory="160"
+        android:title="@string/action_select_all"
+        app:showAsAction="never|withText" />
+</menu>

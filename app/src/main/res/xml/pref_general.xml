@@ -1,0 +1,20 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/pref_header_general">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="show_root_checkbox"
+            android:title="@string/pref_title_show_root" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="show_hidden_file_checkbox"
+            android:title="@string/pref_title_show_hide" />
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/pref_sort_list_titles"
+            android:entryValues="@array/pref_sort_list_values"
+            android:key="sort_type_list"
+            android:negativeButtonText="@string/button_negative"
+            android:positiveButtonText="@null"
+            android:title="@string/pref_title_sort_type" />
+    </PreferenceCategory>
+</PreferenceScreen>

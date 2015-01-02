@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#33B5E5</color>
+    <color name="primaryDark">#0099CC</color>
+    <color name="actionModeBackground">#ff7c7c7c</color>
+    <drawable name="gray_dark">#ffdddbdb</drawable>
+    <drawable name="transparent">#00ffffff</drawable>
+</resources>

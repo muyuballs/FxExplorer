@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp">
+
+    <View
+        android:id="@+id/_topLine"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/list_divider"
+        android:paddingTop="-12dp" />
+
+    <LinearLayout
+        android:id="@+id/_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/_topLine"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="12dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MD5:"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/hash_md5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginTop="4dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:text=""
+            android:textSize="14sp" />
+
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SHA1:"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/hash_sha1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginTop="4dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:text=""
+            android:textSize="14sp" />
+
+        <ProgressBar
+            android:id="@+id/progressBar2"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/_bottom_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/_content"
+        android:background="@drawable/list_divider" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/_bottom_line"
+        android:padding="12dp"
+        android:text="点击hash值复制到剪贴板"
+        android:textSize="12sp" />
+</RelativeLayout>

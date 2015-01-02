@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fx Explorer</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
+    <!-- Settings-->
+    <string name="title_activity_settings">Settings</string>
+    <string name="button_negative">Cancel</string>
+    <string name="pref_header_general">General</string>
+    <string name="pref_title_show_root">Show Root Dir</string>
+    <string name="pref_title_show_hide">Show Hidden Files</string>
+    <string name="pref_title_sort_type">Sort Type</string>
+    <string name="action_compress">Compress</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_cut">Cut</string>
+    <string name="action_select_all">Select All</string>
+    <string name="action_rename">Rename</string>
+    <string name="action_detail">Detail</string>
+    <string name="action_bookmark">BookMark</string>
+</resources>
