@@ -2,7 +2,9 @@ package info.breezes.fxmanager;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -192,9 +194,20 @@ public class MediaFragment extends Fragment {
 
     }
 
-    private void renameMediaItem(MediaItem item) {
-        AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
-        builder.setTitle("新文件名");
+    private void renameMediaItem(final MediaItem item) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("新文件名:");
+        final EditText editText = new EditText(getActivity());
+        builder.setView(editText);
+        builder.setCancelable(false);
+        builder.setNegativeButton("取消", null);
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
     }
 
     private void compressMediaItems(MediaItem... items) {
