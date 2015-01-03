@@ -18,4 +18,5 @@
     <string name="action_rename">Rename</string>
     <string name="action_detail">Detail</string>
     <string name="action_bookmark">BookMark</string>
+    <string name="hint_new_name">new name</string>
 </resources>

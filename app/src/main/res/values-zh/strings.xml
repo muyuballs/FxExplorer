@@ -17,4 +17,5 @@
     <string name="action_rename">重命名</string>
     <string name="action_detail">详细信息</string>
     <string name="action_bookmark">添加书签</string>
+    <string name="hint_new_name">新名称</string>
 </resources>

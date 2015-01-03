@@ -1,12 +1,9 @@
 package info.breezes.fxmanager;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
@@ -15,14 +12,9 @@ import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
-import android.webkit.MimeTypeMap;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilePermission;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -106,7 +98,7 @@ public class LocalFileSystemProvider extends MediaProvider {
     public String getMimeType(MediaItem item) {
         String extension = MimeTypeMap.getFileExtensionFromUrl(item.path);
         String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-        if (TextUtils.isEmpty(mime)) {
+        if (TextUtils.isEmpty(extension) || TextUtils.isEmpty(mime)) {
             mime = testFileIsImage(item.path);
         }
         return mime;

@@ -1,8 +1,8 @@
 package info.breezes.fxmanager;
 
 import android.app.Activity;
+
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,14 +15,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Spannable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -40,6 +38,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import info.breezes.ComputerUnitUtils;
+import info.breezes.fxmanager.android.app.QAlertDialog;
 import info.breezes.fxmanager.dialog.ApkInfoDialog;
 import info.breezes.fxmanager.dialog.FileInfoDialog;
 import info.breezes.fxmanager.model.DrawerMenu;
@@ -196,18 +195,39 @@ public class MediaFragment extends Fragment {
 
     private void renameMediaItem(final MediaItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("新文件名:");
-        final EditText editText = new EditText(getActivity());
-        builder.setView(editText);
-        builder.setCancelable(false);
-        builder.setNegativeButton("取消", null);
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        builder.setTitle("");
+        View content = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_edit_content, null);
+        final EditText editText = (EditText) content.findViewById(R.id.editText);
+        editText.setText(item.title);
+        builder.setView(content);
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
             }
         });
-        builder.show();
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newName = editText.getText().toString();
+                if (TextUtils.isEmpty(newName)) {
+                    Toast.showText(getActivity(), "新文件名不能为空");
+                    return;
+                }
+                dialog.dismiss();
+                if (MediaItemUtil.rename(item, newName)) {
+                    if (currentActionMode != null) {
+                        currentActionMode.finish();
+                    }
+                    reloadMediaList();
+                } else {
+                    Toast.showText(getActivity(), "重命名失败");
+                }
+            }
+        });
+        AlertDialog dialog = builder.create();
+        QAlertDialog.setAutoDismiss(dialog, false);
+        dialog.show();
     }
 
     private void compressMediaItems(MediaItem... items) {
