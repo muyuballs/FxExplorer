@@ -101,7 +101,7 @@ public class MainActivity extends ActionBarActivity implements MenuAdapter.OnIte
             }
             menus.add(musicMenu);
         }
-        if (PreferenceUtil.findPreference(this, R.string.pref_title_show_movie, true)) {
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_movie, true)) {
             if (movieMenu == null) {
                 movieMenu = new DrawerMenu(getString(R.string.menu_movie), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
             }
