@@ -26,9 +26,9 @@
 
             <android.support.v4.view.PagerTabStrip
                 android:id="@+id/pagerTabStrip"
-                android:textColor="?attr/colorPrimaryDark"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:textColor="?attr/colorPrimaryDark" />
 
         </android.support.v4.view.ViewPager>
     </LinearLayout>
@@ -39,7 +39,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="left"
         android:layout_marginTop="@dimen/actionBarSize"
-        android:translationZ="10dp"
         android:background="@android:color/white"
         android:scrollbars="vertical" />
 </android.support.v4.widget.DrawerLayout>

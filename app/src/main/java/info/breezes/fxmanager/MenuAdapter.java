@@ -11,6 +11,7 @@ import android.widget.TextView;
 import info.breezes.fxmanager.model.DrawerMenu;
 
 /**
+ * menu adapter
  * Created by admin on 2014/12/30.
  */
 public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.DrawerMenuHolder> {
@@ -50,7 +51,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.DrawerMenuHold
     }
 
     private final Context context;
-    private final DrawerMenu[] menus;
+    private DrawerMenu[] menus;
 
     private OnItemClickListener onItemClickListener;
 
@@ -59,11 +60,15 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.DrawerMenuHold
         this.menus = menus;
     }
 
+    public void update(DrawerMenu[] drawerMenus) {
+        this.menus = drawerMenus;
+        notifyDataSetChanged();
+    }
+
     @Override
     public DrawerMenuHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View itemView = LayoutInflater.from(context).inflate(R.layout.drawer_menu_item, viewGroup, false);
-        DrawerMenuHolder menuHolder = new DrawerMenuHolder(itemView, this);
-        return menuHolder;
+        return new DrawerMenuHolder(itemView, this);
     }
 
     @Override

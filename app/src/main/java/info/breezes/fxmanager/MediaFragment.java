@@ -38,6 +38,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import info.breezes.ComputerUnitUtils;
+import info.breezes.PreferenceUtil;
 import info.breezes.fxmanager.android.app.QAlertDialog;
 import info.breezes.fxmanager.dialog.ApkInfoDialog;
 import info.breezes.fxmanager.dialog.FileInfoDialog;
@@ -73,6 +74,8 @@ public class MediaFragment extends Fragment {
     private String currentPath;
 
     private ActionMode currentActionMode;
+
+    private boolean showHiddenFiles;
 
     public static MediaFragment newInstance(DrawerMenu drawerMenu) {
         MediaFragment fragment = new MediaFragment();
@@ -189,8 +192,15 @@ public class MediaFragment extends Fragment {
                 return false;
             }
         });
-        loadRoot();
+        currentPath = drawerMenu.path;
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        showHiddenFiles = PreferenceUtil.findPreference(getActivity(), R.string.pref_key_show_hidden, false);
+        reloadMediaList();
     }
 
     private void pinToStart(MediaItem item) {
@@ -374,7 +384,7 @@ public class MediaFragment extends Fragment {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    mediaList = mediaProvider.loadMedia(path, false);
+                    mediaList = mediaProvider.loadMedia(path, showHiddenFiles);
                     Collections.sort(mediaList, new Comparator<MediaItem>() {
                         @Override
                         public int compare(MediaItem lhs, MediaItem rhs) {

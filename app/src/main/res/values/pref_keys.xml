@@ -7,4 +7,6 @@
     <string name="pref_key_show_dir_camera" translatable="false">show_dir_camera_checkbox</string>
     <string name="pref_key_show_dir_download" translatable="false">show_dir_download_checkbox</string>
     <string name="pref_key_show_root" translatable="false">show_root_checkbox</string>
+    <string name="pref_key_show_hidden" translatable="false">show_hidden_files</string>
+    <string name="pref_key_sort_type">sort_type_list</string>
 </resources>

@@ -40,6 +40,17 @@ public class MainActivity extends ActionBarActivity implements MenuAdapter.OnIte
     private MenuAdapter menuAdapter;
     private FolderPagerAdapter folderPagerAdapter;
 
+    private DrawerMenu sdMenu;
+    private DrawerMenu rootDirMenu;
+    private DrawerMenu picMenu;
+    private DrawerMenu musicMenu;
+    private DrawerMenu movieMenu;
+    private DrawerMenu docMenu;
+    private DrawerMenu cameraMenu;
+    private DrawerMenu downLoadMenu;
+    private DrawerMenu settingsMenu;
+    private DrawerMenu helpMenu;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,35 +63,12 @@ public class MainActivity extends ActionBarActivity implements MenuAdapter.OnIte
         rootView.setDrawerListener(drawerToggle);
         menuList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         menuList.setHasFixedSize(true);//do not change size of recycler view when adapter change
-        DrawerMenu sdMenu = new DrawerMenu(getString(R.string.menu_external_storage), Environment.getExternalStorageDirectory().getAbsolutePath(), getResources().getDrawable(R.drawable.ic_sd_storage));
-        ArrayList<DrawerMenu> menus = new ArrayList<>();
-        menus.add(sdMenu);
-        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_root, false)) {
-            menus.add(new DrawerMenu(getString(R.string.menu_root_directory), "/", getResources().getDrawable(R.drawable.ic_storage)));
-        }
-        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
-            menus.add(new DrawerMenu(getString(R.string.menu_picture), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)));
-        }
-        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
-            menus.add(new DrawerMenu(getString(R.string.menu_music), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)));
-        }
-        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
-            menus.add(new DrawerMenu(getString(R.string.menu_movie), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)));
-        }
-        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
-            menus.add(new DrawerMenu(getString(R.string.menu_document), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)));
-        }
-        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
-            menus.add(new DrawerMenu(getString(R.string.menu_camera), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)));
-        }
-        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
-            menus.add(new DrawerMenu(getString(R.string.menu_download), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)));
-        }
-        menus.add(new DrawerMenu(R.id.menu_settings, getString(R.string.menu_settings), null, getResources().getDrawable(R.drawable.ic_settings)));
-        menus.add(new DrawerMenu(R.id.menu_about, getString(R.string.menu_help_feedback), null, getResources().getDrawable(R.drawable.ic_settings)));
-        menuList.setAdapter((menuAdapter = new MenuAdapter(this, menus.toArray(new DrawerMenu[menus.size()]))));
+        menuList.setAdapter((menuAdapter = new MenuAdapter(this, null)));
         menuAdapter.setOnItemClickListener(this);
         viewPager.setAdapter((folderPagerAdapter = new FolderPagerAdapter(getSupportFragmentManager())));
+
+        sdMenu = new DrawerMenu(getString(R.string.menu_external_storage), Environment.getExternalStorageDirectory().getAbsolutePath(), getResources().getDrawable(R.drawable.ic_sd_storage));
+
         String title = getIntent().getStringExtra(MediaFragment.EXTRA_DIR_NAME);
         String path = getIntent().getStringExtra(MediaFragment.EXTRA_INIT_DIR);
         if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(path)) {
@@ -88,6 +76,64 @@ public class MainActivity extends ActionBarActivity implements MenuAdapter.OnIte
         } else {
             openMedia(sdMenu);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ArrayList<DrawerMenu> menus = new ArrayList<>();
+        menus.add(sdMenu);
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_root, false)) {
+            if (rootDirMenu == null) {
+                rootDirMenu = new DrawerMenu(getString(R.string.menu_root_directory), "/", getResources().getDrawable(R.drawable.ic_storage));
+            }
+            menus.add(rootDirMenu);
+        }
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
+            if (picMenu == null) {
+                picMenu = new DrawerMenu(getString(R.string.menu_picture), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+            }
+            menus.add(picMenu);
+        }
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_music, true)) {
+            if (musicMenu == null) {
+                musicMenu = new DrawerMenu(getString(R.string.menu_music), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+            }
+            menus.add(musicMenu);
+        }
+        if (PreferenceUtil.findPreference(this, R.string.pref_title_show_movie, true)) {
+            if (movieMenu == null) {
+                movieMenu = new DrawerMenu(getString(R.string.menu_movie), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+            }
+            menus.add(movieMenu);
+        }
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_document, true)) {
+            if (docMenu == null) {
+                docMenu = new DrawerMenu(getString(R.string.menu_document), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+            }
+            menus.add(docMenu);
+        }
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_camera, true)) {
+            if (cameraMenu == null) {
+                cameraMenu = new DrawerMenu(getString(R.string.menu_camera), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+            }
+            menus.add(cameraMenu);
+        }
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_download, true)) {
+            if (downLoadMenu == null) {
+                downLoadMenu = new DrawerMenu(getString(R.string.menu_download), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+            }
+            menus.add(downLoadMenu);
+        }
+        if (settingsMenu == null) {
+            settingsMenu = new DrawerMenu(R.id.menu_settings, getString(R.string.menu_settings), null, getResources().getDrawable(R.drawable.ic_settings));
+        }
+        menus.add(settingsMenu);
+        if (helpMenu == null) {
+            helpMenu = new DrawerMenu(R.id.menu_about, getString(R.string.menu_help_feedback), null, getResources().getDrawable(R.drawable.ic_settings));
+        }
+        menus.add(helpMenu);
+        menuAdapter.update(menus.toArray(new DrawerMenu[menus.size()]));
     }
 
     @Override
