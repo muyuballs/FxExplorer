@@ -3,6 +3,7 @@ package info.breezes.fxmanager;
 import android.app.Activity;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -189,8 +190,26 @@ public class MediaFragment extends Fragment {
         return view;
     }
 
-    private void deleteMediaItems(MediaItem... items) {
-
+    private void deleteMediaItems(final MediaItem... items) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("提示");
+        builder.setMessage("你确定要删除这些文件么?");
+        builder.setNegativeButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int deleted = MediaItemUtil.delete(true, items);
+                if (deleted > 0) {
+                    if (deleted < items.length) {
+                        Toast.showText(getActivity(), "部分文件删除失败");
+                    } else {
+                        Toast.showText(getActivity(), "删除成功");
+                    }
+                    reloadMediaList();
+                }
+            }
+        });
+        builder.setPositiveButton("取消", null);
+        builder.show();
     }
 
     private void renameMediaItem(final MediaItem item) {
@@ -216,9 +235,6 @@ public class MediaFragment extends Fragment {
                 }
                 dialog.dismiss();
                 if (MediaItemUtil.rename(item, newName)) {
-                    if (currentActionMode != null) {
-                        currentActionMode.finish();
-                    }
                     reloadMediaList();
                 } else {
                     Toast.showText(getActivity(), "重命名失败");
@@ -230,8 +246,70 @@ public class MediaFragment extends Fragment {
         dialog.show();
     }
 
-    private void compressMediaItems(MediaItem... items) {
+    private void compressMediaItems(final MediaItem... items) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("提示");
+        View content = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_edit_content, null);
+        final EditText editText = (EditText) content.findViewById(R.id.editText);
+        editText.setHint("目标文件名");
+        builder.setView(content);
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newName = editText.getText().toString();
+                if (TextUtils.isEmpty(newName)) {
+                    Toast.showText(getActivity(), "文件名不能为空");
+                    return;
+                }
+                String out = currentPath + File.separator + newName;
+                if (!out.endsWith("\\.zip")) {
+                    out += ".zip";
+                }
+                File file = new File(out);
+                if (file.exists()) {
+                    Toast.showText(getActivity(), "文件已存在");
+                    return;
+                }
+                MediaItemUtil.compress(out, new MediaItemUtil.OnProgressChangeListener() {
+                    private ProgressDialog pd;
 
+                    @Override
+                    public void onPreExecute() {
+                        pd = new ProgressDialog(getActivity());
+                        pd.setCancelable(false);
+                        pd.setTitle("正在压缩");
+                        pd.setIndeterminate(true);
+                        pd.show();
+                    }
+
+                    @Override
+                    public void onProgressChanged(String file, long max, long current) {
+                        pd.setMessage(file);
+                    }
+
+                    @Override
+                    public void onPostExecute(boolean success) {
+                        pd.dismiss();
+                        if (success) {
+                            Toast.showText(getActivity(), "压缩文件成功");
+                            reloadMediaList();
+                        } else {
+                            Toast.showText(getActivity(), "压缩文件失败");
+                        }
+                    }
+                }, items);
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        QAlertDialog.setAutoDismiss(dialog, false);
+        dialog.show();
     }
 
     private void reloadActionMenu() {
@@ -242,6 +320,9 @@ public class MediaFragment extends Fragment {
     }
 
     private void reloadMediaList() {
+        if (currentActionMode != null) {
+            currentActionMode.finish();
+        }
         loadMediaFromPath(currentPath);
     }
 
@@ -291,7 +372,6 @@ public class MediaFragment extends Fragment {
             }
         }.executeOnExecutor(executor);
     }
-
 
     private void loadIcon(final MediaAdapter.MediaItemHolder mediaItemHolder) {
         new AsyncTask<Void, Void, Void>() {
