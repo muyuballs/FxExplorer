@@ -38,7 +38,7 @@ public class LocalFileSystemProvider extends MediaProvider {
         File root = new File(path);
         Log.d(null, path);
         if (!root.canRead()) {
-            throw new RuntimeException("没有读取权限");
+            throw new RuntimeException(mContext.getString(R.string.tip_no_read_permission));
         }
         if (root.isDirectory()) {
             List<MediaItem> mediaItems = new ArrayList<>();

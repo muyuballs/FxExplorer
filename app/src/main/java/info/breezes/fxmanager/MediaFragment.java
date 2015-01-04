@@ -1,13 +1,11 @@
 package info.breezes.fxmanager;
 
 import android.app.Activity;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -58,6 +56,8 @@ import info.breezes.toolkit.ui.Toast;
 public class MediaFragment extends Fragment {
     private static final String ARG_DRAWER_MENU = "mediaItems";
     private static final String State_Path_Stack = "_path_stack_";
+    public static final String EXTRA_INIT_DIR = "info.breezes.fx.extra.INIT_DIR";
+    public static final String EXTRA_DIR_NAME = "info.breezes.fx.extra.EXTRA_DIR_NAME";
 
     private static Executor executor = Executors.newFixedThreadPool(10);
 
@@ -163,7 +163,7 @@ public class MediaFragment extends Fragment {
                                 }
                             } else if (menuItem.getItemId() == R.id.action_detail) {
                                 if (mAdapter.getSelectedCount() > 1) {
-                                    Toast.showText(getActivity(), "不能显示多个文件的详情");
+                                    Toast.showText(getActivity(), getString(R.string.tip_cannt_show_multi_detail));
                                 } else {
                                     showItemDetailInfo();
                                 }
@@ -194,36 +194,41 @@ public class MediaFragment extends Fragment {
     }
 
     private void pinToStart(MediaItem item) {
-        Intent shortcut = new Intent(Intent.ACTION_CREATE_SHORTCUT);
+        Intent shortcut = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
         //快捷方式的名称
         shortcut.putExtra(Intent.EXTRA_SHORTCUT_NAME, item.title);
         shortcut.putExtra("duplicate", false); //不允许重复创建
-        shortcut.putExtra(Intent.EXTRA_SHORTCUT_INTENT, new Intent(getActivity(), MainActivity.class));
+        Intent innerIntent = new Intent(getActivity(), MainActivity.class);
+        innerIntent.putExtra(EXTRA_INIT_DIR, item.path);
+        innerIntent.putExtra(EXTRA_DIR_NAME, item.title);
+        shortcut.putExtra(Intent.EXTRA_SHORTCUT_INTENT, innerIntent);
         //快捷方式的图标
         Intent.ShortcutIconResource icon = Intent.ShortcutIconResource.fromContext(getActivity(), R.drawable.ic_action_collection);
-        shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON, icon);
+        shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
         getActivity().sendBroadcast(shortcut);
+        Toast.showText(getActivity(), String.format(getString(R.string.tip_pin_start_ok), item.title))
+        ;
     }
 
     private void deleteMediaItems(final MediaItem... items) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("提示");
-        builder.setMessage("你确定要删除这些文件么?");
-        builder.setNegativeButton("确定", new DialogInterface.OnClickListener() {
+        builder.setTitle(android.R.string.dialog_alert_title);
+        builder.setMessage(getString(R.string.dialog_msg_are_you_confirm_delete_them));
+        builder.setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 int deleted = MediaItemUtil.delete(true, items);
                 if (deleted > 0) {
                     if (deleted < items.length) {
-                        Toast.showText(getActivity(), "部分文件删除失败");
+                        Toast.showText(getActivity(), getString(R.string.tip_part_of_delete_ok));
                     } else {
-                        Toast.showText(getActivity(), "删除成功");
+                        Toast.showText(getActivity(), getString(R.string.tip_delete_ok));
                     }
                     reloadMediaList();
                 }
             }
         });
-        builder.setPositiveButton("取消", null);
+        builder.setPositiveButton(android.R.string.cancel, null);
         builder.show();
     }
 
@@ -234,25 +239,25 @@ public class MediaFragment extends Fragment {
         final EditText editText = (EditText) content.findViewById(R.id.editText);
         editText.setText(item.title);
         builder.setView(content);
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
             }
         });
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newName = editText.getText().toString();
                 if (TextUtils.isEmpty(newName)) {
-                    Toast.showText(getActivity(), "新文件名不能为空");
+                    Toast.showText(getActivity(), getString(R.string.tip_file_name_cannt_null));
                     return;
                 }
                 dialog.dismiss();
                 if (MediaItemUtil.rename(item, newName)) {
                     reloadMediaList();
                 } else {
-                    Toast.showText(getActivity(), "重命名失败");
+                    Toast.showText(getActivity(), getString(R.string.tip_rename_failed));
                 }
             }
         });
@@ -263,23 +268,23 @@ public class MediaFragment extends Fragment {
 
     private void compressMediaItems(final MediaItem... items) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("提示");
+        builder.setTitle(getString(R.string.dialog_title_tip));
         View content = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_edit_content, null);
         final EditText editText = (EditText) content.findViewById(R.id.editText);
-        editText.setHint("目标文件名");
+        editText.setHint(getString(R.string.hint_target_file_name));
         builder.setView(content);
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
             }
         });
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newName = editText.getText().toString();
                 if (TextUtils.isEmpty(newName)) {
-                    Toast.showText(getActivity(), "文件名不能为空");
+                    Toast.showText(getActivity(), getString(R.string.tip_file_name_cannt_null));
                     return;
                 }
                 String out = currentPath + File.separator + newName;
@@ -288,7 +293,7 @@ public class MediaFragment extends Fragment {
                 }
                 File file = new File(out);
                 if (file.exists()) {
-                    Toast.showText(getActivity(), "文件已存在");
+                    Toast.showText(getActivity(), getString(R.string.tip_file_already_exists));
                     return;
                 }
                 MediaItemUtil.compress(out, new MediaItemUtil.OnProgressChangeListener() {
@@ -298,7 +303,7 @@ public class MediaFragment extends Fragment {
                     public void onPreExecute() {
                         pd = new ProgressDialog(getActivity());
                         pd.setCancelable(false);
-                        pd.setTitle("正在压缩");
+                        pd.setTitle(getString(R.string.dialog_title_compressing));
                         pd.setIndeterminate(true);
                         pd.show();
                     }
@@ -312,10 +317,10 @@ public class MediaFragment extends Fragment {
                     public void onPostExecute(boolean success) {
                         pd.dismiss();
                         if (success) {
-                            Toast.showText(getActivity(), "压缩文件成功");
+                            Toast.showText(getActivity(), getString(R.string.tip_compress_ok));
                             reloadMediaList();
                         } else {
-                            Toast.showText(getActivity(), "压缩文件失败");
+                            Toast.showText(getActivity(), getString(R.string.tip_compress_failed));
                         }
                     }
                 }, items);
@@ -333,7 +338,9 @@ public class MediaFragment extends Fragment {
             currentActionMode.getMenuInflater().inflate(mAdapter.getSelectedCount() > 1 ? R.menu.menu_mutil_item : R.menu.menu_single_item, currentActionMode.getMenu());
             if (mAdapter.getSelectedItems().get(0).type == MediaItem.MediaType.File) {
                 MenuItem item = currentActionMode.getMenu().findItem(R.id.action_add_bookmark);
-                item.setEnabled(false);
+                if (item != null) {
+                    item.setEnabled(false);
+                }
             }
         }
     }
@@ -535,7 +542,7 @@ public class MediaFragment extends Fragment {
                     if (mediaItem.type == MediaItem.MediaType.File) {
                         this.descriptionView.setText(ComputerUnitUtils.toReadFriendly(mediaItem.length));
                     } else {
-                        this.descriptionView.setText(String.format("%d个项目", mediaItem.childCount));
+                        this.descriptionView.setText(String.format(getString(R.string.description_item_count), mediaItem.childCount));
                     }
                     loadIcon(this);
                 }

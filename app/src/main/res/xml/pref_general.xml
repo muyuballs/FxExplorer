@@ -1,8 +1,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
     <PreferenceCategory android:title="@string/pref_header_general">
         <SwitchPreference
             android:defaultValue="false"
-            android:key="show_root_checkbox"
+            android:drawableLeft="@android:drawable/ic_dialog_info"
+            android:summary="@string/pref_summary_show_root"
+            android:key="@string/pref_key_show_root"
             android:title="@string/pref_title_show_root" />
         <SwitchPreference
             android:defaultValue="false"
@@ -17,4 +20,37 @@
             android:positiveButtonText="@null"
             android:title="@string/pref_title_sort_type" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_header_dirs" >
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_show_dir_pic"
+            android:textSize="12sp"
+            android:title="@string/pref_title_show_pic" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_show_dir_music"
+            android:textSize="12sp"
+            android:title="@string/pref_title_show_music" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_show_dir_movie"
+            android:textSize="12sp"
+            android:title="@string/pref_title_show_movie" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_show_dir_document"
+            android:textSize="12sp"
+            android:title="@string/pref_title_show_document" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_show_dir_camera"
+            android:textSize="12sp"
+            android:title="@string/pref_title_show_camera" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_show_dir_download"
+            android:textSize="12sp"
+            android:title="@string/pref_title_show_download" />
+    </PreferenceCategory>
+    <Preference android:summary="注意：修改将在退出后重新打开时生效" />
 </PreferenceScreen>

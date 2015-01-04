@@ -12,12 +12,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import java.util.ArrayList;
 
+import info.breezes.PreferenceUtil;
 import info.breezes.fxmanager.model.DrawerMenu;
 import info.breezes.toolkit.ui.LayoutViewHelper;
 import info.breezes.toolkit.ui.annotation.LayoutView;
@@ -50,29 +52,42 @@ public class MainActivity extends ActionBarActivity implements MenuAdapter.OnIte
         rootView.setDrawerListener(drawerToggle);
         menuList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         menuList.setHasFixedSize(true);//do not change size of recycler view when adapter change
-        DrawerMenu sdMenu = new DrawerMenu("内部存储", Environment.getExternalStorageDirectory().getAbsolutePath(), getResources().getDrawable(R.drawable.ic_sd_storage));
-        menuList.setAdapter((menuAdapter = new MenuAdapter(this, new DrawerMenu[]{
-                //new DrawerMenu("根目录", "/", getResources().getDrawable(R.drawable.ic_storage)),
-                sdMenu,
-                new DrawerMenu("应用程序", "", getResources().getDrawable(R.drawable.ic_storage)),
-                new DrawerMenu("图片", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)),
-                new DrawerMenu("音乐", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)),
-                new DrawerMenu("电影", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)),
-                new DrawerMenu("文档", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)),
-                new DrawerMenu("相机", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)),
-                new DrawerMenu("下载", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)),
-                new DrawerMenu(R.id.menu_settings, "设置", null, getResources().getDrawable(R.drawable.ic_settings)),
-                new DrawerMenu(R.id.menu_about, "帮助和反馈", null, getResources().getDrawable(R.drawable.ic_settings)),
-        })));
+        DrawerMenu sdMenu = new DrawerMenu(getString(R.string.menu_external_storage), Environment.getExternalStorageDirectory().getAbsolutePath(), getResources().getDrawable(R.drawable.ic_sd_storage));
+        ArrayList<DrawerMenu> menus = new ArrayList<>();
+        menus.add(sdMenu);
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_root, false)) {
+            menus.add(new DrawerMenu(getString(R.string.menu_root_directory), "/", getResources().getDrawable(R.drawable.ic_storage)));
+        }
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
+            menus.add(new DrawerMenu(getString(R.string.menu_picture), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)));
+        }
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
+            menus.add(new DrawerMenu(getString(R.string.menu_music), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)));
+        }
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
+            menus.add(new DrawerMenu(getString(R.string.menu_movie), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)));
+        }
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
+            menus.add(new DrawerMenu(getString(R.string.menu_document), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)));
+        }
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
+            menus.add(new DrawerMenu(getString(R.string.menu_camera), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)));
+        }
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
+            menus.add(new DrawerMenu(getString(R.string.menu_download), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage)));
+        }
+        menus.add(new DrawerMenu(R.id.menu_settings, getString(R.string.menu_settings), null, getResources().getDrawable(R.drawable.ic_settings)));
+        menus.add(new DrawerMenu(R.id.menu_about, getString(R.string.menu_help_feedback), null, getResources().getDrawable(R.drawable.ic_settings)));
+        menuList.setAdapter((menuAdapter = new MenuAdapter(this, menus.toArray(new DrawerMenu[menus.size()]))));
         menuAdapter.setOnItemClickListener(this);
         viewPager.setAdapter((folderPagerAdapter = new FolderPagerAdapter(getSupportFragmentManager())));
-        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-        });
-        openMedia(sdMenu);
+        String title = getIntent().getStringExtra(MediaFragment.EXTRA_DIR_NAME);
+        String path = getIntent().getStringExtra(MediaFragment.EXTRA_INIT_DIR);
+        if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(path)) {
+            openMedia(new DrawerMenu(title, path));
+        } else {
+            openMedia(sdMenu);
+        }
     }
 
     @Override

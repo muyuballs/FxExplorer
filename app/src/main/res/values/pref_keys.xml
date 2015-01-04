@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_key_show_dir_pic" translatable="false">show_dir_pic_checkbox</string>
+    <string name="pref_key_show_dir_music" translatable="false">show_dir_music_checkbox</string>
+    <string name="pref_key_show_dir_movie" translatable="false">show_dir_movie_checkbox</string>
+    <string name="pref_key_show_dir_document" translatable="false">show_dir_document_checkbox</string>
+    <string name="pref_key_show_dir_camera" translatable="false">show_dir_camera_checkbox</string>
+    <string name="pref_key_show_dir_download" translatable="false">show_dir_download_checkbox</string>
+    <string name="pref_key_show_root" translatable="false">show_root_checkbox</string>
+</resources>

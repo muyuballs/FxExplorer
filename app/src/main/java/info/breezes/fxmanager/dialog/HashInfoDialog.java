@@ -54,7 +54,7 @@ public class HashInfoDialog {
         asyncComputeHash("MD5", mediaItem, md5TextView, (ProgressBar) view.findViewById(R.id.progressBar));
         asyncComputeHash("SHA1", mediaItem, sha1TextView, (ProgressBar) view.findViewById(R.id.progressBar2));
         builder.setView(view);
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();

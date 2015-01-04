@@ -39,6 +39,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="left"
         android:layout_marginTop="@dimen/actionBarSize"
+        android:translationZ="10dp"
         android:background="@android:color/white"
         android:scrollbars="vertical" />
 </android.support.v4.widget.DrawerLayout>
