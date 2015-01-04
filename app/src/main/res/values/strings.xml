@@ -25,7 +25,7 @@
     <string name="pref_title_show_movie">Movie</string>
     <string name="pref_title_show_music">Music</string>
     <string name="pref_title_show_pic">Picture</string>
-    <string name="pref_header_dirs">Custom Dirs</string>
+    <string name="pref_header_dirs">Custom Directories</string>
     <string name="pref_summary_show_root">Danger! if you are not very clear the contents of the directory "/" ，please do not turn it on</string>
     <string name="menu_camera">Camera</string>
     <string name="menu_document">Document</string>
