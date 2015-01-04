@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -172,6 +173,8 @@ public class MediaFragment extends Fragment {
                                 compressMediaItems(mAdapter.getSelectedItems().toArray(new MediaItem[0]));
                             } else if (menuItem.getItemId() == R.id.action_rename) {
                                 renameMediaItem(mAdapter.getSelectedItems().get(0));
+                            } else if (menuItem.getItemId() == R.id.action_add_bookmark) {
+                                pinToStart(mAdapter.getSelectedItems().get(0));
                             }
                             return true;
                         }
@@ -188,6 +191,18 @@ public class MediaFragment extends Fragment {
         });
         loadRoot();
         return view;
+    }
+
+    private void pinToStart(MediaItem item) {
+        Intent shortcut = new Intent(Intent.ACTION_CREATE_SHORTCUT);
+        //快捷方式的名称
+        shortcut.putExtra(Intent.EXTRA_SHORTCUT_NAME, item.title);
+        shortcut.putExtra("duplicate", false); //不允许重复创建
+        shortcut.putExtra(Intent.EXTRA_SHORTCUT_INTENT, new Intent(getActivity(), MainActivity.class));
+        //快捷方式的图标
+        Intent.ShortcutIconResource icon = Intent.ShortcutIconResource.fromContext(getActivity(), R.drawable.ic_action_collection);
+        shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON, icon);
+        getActivity().sendBroadcast(shortcut);
     }
 
     private void deleteMediaItems(final MediaItem... items) {
@@ -316,6 +331,10 @@ public class MediaFragment extends Fragment {
         if (currentActionMode != null) {
             currentActionMode.getMenu().clear();
             currentActionMode.getMenuInflater().inflate(mAdapter.getSelectedCount() > 1 ? R.menu.menu_mutil_item : R.menu.menu_single_item, currentActionMode.getMenu());
+            if (mAdapter.getSelectedItems().get(0).type == MediaItem.MediaType.File) {
+                MenuItem item = currentActionMode.getMenu().findItem(R.id.action_add_bookmark);
+                item.setEnabled(false);
+            }
         }
     }
 

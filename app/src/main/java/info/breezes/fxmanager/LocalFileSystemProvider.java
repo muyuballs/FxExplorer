@@ -95,6 +95,11 @@ public class LocalFileSystemProvider extends MediaProvider {
     }
 
     @Override
+    public Drawable loadMediaBitmapIcon(MediaItem item) {
+        return null;
+    }
+
+    @Override
     public String getMimeType(MediaItem item) {
         String extension = MimeTypeMap.getFileExtensionFromUrl(item.path);
         String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
