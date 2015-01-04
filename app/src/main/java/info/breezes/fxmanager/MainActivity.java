@@ -1,6 +1,7 @@
 package info.breezes.fxmanager;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentManager;
@@ -17,6 +18,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import info.breezes.PreferenceUtil;
@@ -109,7 +111,11 @@ public class MainActivity extends ActionBarActivity implements MenuAdapter.OnIte
         }
         if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_document, true)) {
             if (docMenu == null) {
-                docMenu = new DrawerMenu(getString(R.string.menu_document), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    docMenu = new DrawerMenu(getString(R.string.menu_document), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+                } else {
+                    docMenu = new DrawerMenu(getString(R.string.menu_document), Environment.getExternalStorageDirectory().getPath() + File.separator + "Documents", getResources().getDrawable(R.drawable.ic_storage));
+                }
             }
             menus.add(docMenu);
         }
@@ -145,7 +151,7 @@ public class MainActivity extends ActionBarActivity implements MenuAdapter.OnIte
                 startActivity(new Intent(this, SettingsActivity.class));
                 return;
         }
-        rootView.closeDrawer(Gravity.LEFT);
+        rootView.closeDrawer(Gravity.START);
         getSupportActionBar().setSubtitle(item.path);
         openMedia(item);
     }
