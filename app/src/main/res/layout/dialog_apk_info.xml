@@ -50,7 +50,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="版本:"
+                    android:text="@string/version"
                     android:textSize="12sp" />
 
                 <TextView
@@ -70,7 +70,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="大小:"
+                    android:text="@string/size"
                     android:textSize="12sp" />
 
                 <TextView
@@ -97,7 +97,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/_space"
-        android:text="包&#160;&#160;&#160;&#160;名:" />
+        android:text="@string/package_name" />
 
     <TextView
         android:id="@+id/packageName"
@@ -113,7 +113,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/_package"
-        android:text="安&#160;&#160;&#160;&#160;装:" />
+        android:text="@string/install" />
 
     <TextView
         android:id="@+id/installVersion"
@@ -122,5 +122,5 @@
         android:layout_below="@+id/packageName"
         android:layout_toRightOf="@+id/_install"
         android:paddingLeft="4dp"
-        android:text="未安装" />
+        android:text="@string/apk_detail_not_install" />
 </RelativeLayout>

@@ -47,12 +47,12 @@ public class ApkInfoDialog {
         ((TextView) view.findViewById(R.id.packageName)).setText(info.packageName);
         try {
             PackageInfo pInfo = pm.getPackageInfo(info.packageName, 0);
-            ((TextView) view.findViewById(R.id.installVersion)).setText(String.format("已安装(%s)", pInfo.versionName));
+            ((TextView) view.findViewById(R.id.installVersion)).setText(String.format(context.getString(R.string.apk_detail_installed), pInfo.versionName));
         } catch (PackageManager.NameNotFoundException e) {
-            ((TextView) view.findViewById(R.id.installVersion)).setText("未安装");
+            ((TextView) view.findViewById(R.id.installVersion)).setText(context.getString(R.string.apk_detail_not_install));
         }
         builder.setView(view);
-        builder.setPositiveButton("安装", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(context.getString(R.string.btn_install), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent();

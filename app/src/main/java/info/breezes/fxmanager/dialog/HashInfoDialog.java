@@ -35,7 +35,7 @@ public class HashInfoDialog {
             TextView tv = (TextView) v;
             ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             clipboardManager.setPrimaryClip(ClipData.newPlainText(String.valueOf(tv.getTag()), tv.getText()));
-            Toast.showText(context, String.format("%s值已经复制到剪贴板", tv.getTag()));
+            Toast.showText(context, String.format(context.getString(R.string.tip_hash_copied), tv.getTag()));
         }
     };
 
@@ -87,7 +87,7 @@ public class HashInfoDialog {
                             hash = DigestUtils.sha1File(mediaItem.path);
                             break;
                         default:
-                            msg = "不支持的Hash算法(" + type + ")";
+                            msg = String.format(context.getString(R.string.tip_unknown_hash_method), type);
                     }
                 } catch (Exception exp) {
                     msg = exp.getMessage();

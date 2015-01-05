@@ -84,6 +84,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/_bottom_line"
         android:padding="12dp"
-        android:text="点击hash值复制到剪贴板"
+        android:text="@string/tip_click_copy_hash_code"
         android:textSize="12sp" />
 </RelativeLayout>

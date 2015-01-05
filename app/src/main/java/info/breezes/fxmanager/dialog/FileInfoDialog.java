@@ -41,14 +41,14 @@ public class FileInfoDialog {
             Rect size = mediaProvider.getImageSize(mediaItem);
             ((TextView) view.findViewById(R.id.type)).setText(String.format("%s (%d x %d)", mime, size.width(), size.height()));
         } else {
-            ((TextView) view.findViewById(R.id.type)).setText(TextUtils.isEmpty(mime) ? "未知" : mime);
+            ((TextView) view.findViewById(R.id.type)).setText(TextUtils.isEmpty(mime) ? context.getString(R.string.unkown) : mime);
         }
         ((TextView) view.findViewById(R.id.size)).setText(ComputerUnitUtils.toReadFriendly(mediaItem.length));
         ((TextView) view.findViewById(R.id.modifyTime)).setText(DateUtils.formatDateTime(context, mediaItem.lastModify, DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE));
 
         builder.setView(view);
         if (showHash) {
-            builder.setNeutralButton("显示效验码", new DialogInterface.OnClickListener() {
+            builder.setNeutralButton(context.getString(R.string.show_hash_code), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     new HashInfoDialog(context).showHashDialog(mediaItem);
@@ -79,7 +79,7 @@ public class FileInfoDialog {
         ((TextView) view.findViewById(R.id.modifyTime)).setText(DateUtils.formatDateTime(context, mediaItem.lastModify, DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE));
 
         builder.setView(view);
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -108,7 +108,7 @@ public class FileInfoDialog {
 
             @Override
             protected void onProgressUpdate(Void... values) {
-                detailTextView.setText(String.format("%d个文件  %d个文件夹", fileCount, folderCount));
+                detailTextView.setText(String.format(context.getString(R.string.dialog_msg_folder_detial), fileCount, folderCount));
             }
 
             @Override
@@ -143,7 +143,7 @@ public class FileInfoDialog {
                 if (!TextUtils.isEmpty(msg)) {
                     Toast.showText(context, msg);
                 }
-                detailTextView.setText(String.format("%d个文件  %d个文件夹", fileCount, folderCount));
+                detailTextView.setText(String.format(context.getString(R.string.dialog_msg_folder_detial), fileCount, folderCount));
                 if (progressBar != null) {
                     progressBar.setVisibility(View.GONE);
                     progressBar.setIndeterminate(false);
@@ -180,7 +180,6 @@ public class FileInfoDialog {
                     imageView.setImageDrawable(icon);
                 }
             }
-
         }.execute();
     }
 }

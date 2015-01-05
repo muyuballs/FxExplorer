@@ -46,11 +46,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="包含:"
+                    android:text="@string/contain"
                     android:textSize="12sp" />
+
                 <TextView
                     android:id="@+id/type"
                     android:layout_width="wrap_content"
@@ -80,10 +82,10 @@
                     android:textSize="12sp" />
 
                 <ProgressBar
+                    android:id="@+id/progressBar3"
                     style="?android:attr/progressBarStyleSmall"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/progressBar3" />
+                    android:layout_height="wrap_content" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -101,7 +103,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/_space"
-        android:text="修改时间:" />
+        android:text="@string/last_modify_time" />
 
     <TextView
         android:id="@+id/modifyTime"
