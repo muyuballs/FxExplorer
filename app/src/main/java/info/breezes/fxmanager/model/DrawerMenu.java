@@ -10,7 +10,11 @@ import java.io.Serializable;
 public class DrawerMenu implements Serializable{
     public int id;
     public String title;
+    public int titleId;
+
     public transient  Drawable icon;
+    public int iconId;
+
     public String mediaProvider;
     public String path;
 

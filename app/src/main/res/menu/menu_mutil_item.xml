@@ -11,6 +11,7 @@
         android:id="@+id/action_zip"
         android:orderInCategory="120"
         android:title="@string/action_compress"
+        android:icon="@drawable/ic_compress_dark"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_copy"

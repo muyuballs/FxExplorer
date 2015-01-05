@@ -3,12 +3,6 @@
     <PreferenceCategory android:title="@string/pref_header_general">
         <SwitchPreference
             android:defaultValue="false"
-            android:drawableLeft="@android:drawable/ic_dialog_info"
-            android:key="@string/pref_key_show_root"
-            android:summary="@string/pref_summary_show_root"
-            android:title="@string/pref_title_show_root" />
-        <SwitchPreference
-            android:defaultValue="false"
             android:key="@string/pref_key_show_hidden"
             android:title="@string/pref_title_show_hide" />
         <ListPreference
@@ -51,5 +45,13 @@
             android:key="@string/pref_key_show_dir_download"
             android:textSize="12sp"
             android:title="@string/pref_title_show_download" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_header_other">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:drawableLeft="@android:drawable/ic_dialog_info"
+            android:key="@string/pref_key_show_root"
+            android:summary="@string/pref_summary_show_root"
+            android:title="@string/pref_title_show_root" />
     </PreferenceCategory>
 </PreferenceScreen>

@@ -77,12 +77,20 @@ public class LocalFileSystemProvider extends MediaProvider {
                 String mime = getMimeType(item);
                 if ("apk".equalsIgnoreCase(extension)) {
                     icon = getApkIcon(item.path, mContext);
-                } else if (mime != null && mime.startsWith("image/")) {
-                    icon = getImageThumbnail(item.path, 48, 48);
-                } else if (mime != null && mime.startsWith("video/")) {
-                    Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(item.path, MediaStore.Images.Thumbnails.MICRO_KIND);
-                    if (bitmap != null) {
-                        icon = new BitmapDrawable(mContext.getResources(), bitmap);
+                } else if (mime != null) {
+                    if (mime.startsWith("image/")) {
+                        icon = getImageThumbnail(item.path, 48, 48);
+                    } else if (mime.startsWith("video/")) {
+                        Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(item.path, MediaStore.Images.Thumbnails.MICRO_KIND);
+                        if (bitmap != null) {
+                            icon = new BitmapDrawable(mContext.getResources(), bitmap);
+                        } else {
+                            icon = mContext.getResources().getDrawable(R.drawable.ic_movies);
+                        }
+                    } else if (mime.startsWith("audio/")) {
+                        icon = mContext.getResources().getDrawable(R.drawable.ic_music);
+                    } else if (mime.startsWith("text/")) {
+                        icon = mContext.getResources().getDrawable(R.drawable.ic_text);
                     }
                 }
             }
@@ -122,7 +130,7 @@ public class LocalFileSystemProvider extends MediaProvider {
         if (file.isFile() && file.exists() && file.canRead()) {
             try {
                 FileInputStream fis = new FileInputStream(file);
-                byte[] buf = new byte[8];
+                byte[] buf = new byte[11];
                 fis.read(buf);
                 fis.close();
                 byte[] gifbuf = new byte[6];
@@ -130,10 +138,14 @@ public class LocalFileSystemProvider extends MediaProvider {
                 if (Arrays.equals(gifbuf, new byte[]{0x47, 0x49, 0x46, 0x38, 0x37, 0x61}) || Arrays.equals(buf, new byte[]{0x47, 0x49, 0x46, 0x38, 0x39, 0x61})) {//gif
                     return "image/gif";
                 }
-                if (buf[0] == 0xff && buf[1] == 0xd8) {//jpg
+                byte[] jpgbuf = new byte[4];
+                System.arraycopy(buf, 6, jpgbuf, 0, 4);
+                if (Arrays.equals(jpgbuf, new byte[]{0x4a, 0x46, 0x49, 0x46})) {//jpg
                     return "image/jpeg";
                 }
-                if (Arrays.equals(buf, new byte[]{(byte) 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a})) {//png
+                byte[] pngbuf = new byte[8];
+                System.arraycopy(buf, 0, pngbuf, 0, 8);
+                if (Arrays.equals(pngbuf, new byte[]{(byte) 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a})) {//png
                     return "image/png";
                 }
             } catch (Exception e) {

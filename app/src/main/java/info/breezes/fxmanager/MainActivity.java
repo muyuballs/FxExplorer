@@ -93,19 +93,19 @@ public class MainActivity extends ActionBarActivity implements MenuAdapter.OnIte
         }
         if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_pic, true)) {
             if (picMenu == null) {
-                picMenu = new DrawerMenu(getString(R.string.menu_picture), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+                picMenu = new DrawerMenu(getString(R.string.menu_picture), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_picture));
             }
             menus.add(picMenu);
         }
         if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_music, true)) {
             if (musicMenu == null) {
-                musicMenu = new DrawerMenu(getString(R.string.menu_music), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+                musicMenu = new DrawerMenu(getString(R.string.menu_music), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_music));
             }
             menus.add(musicMenu);
         }
         if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_movie, true)) {
             if (movieMenu == null) {
-                movieMenu = new DrawerMenu(getString(R.string.menu_movie), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+                movieMenu = new DrawerMenu(getString(R.string.menu_movie), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_movies));
             }
             menus.add(movieMenu);
         }
@@ -121,13 +121,13 @@ public class MainActivity extends ActionBarActivity implements MenuAdapter.OnIte
         }
         if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_camera, true)) {
             if (cameraMenu == null) {
-                cameraMenu = new DrawerMenu(getString(R.string.menu_camera), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+                cameraMenu = new DrawerMenu(getString(R.string.menu_camera), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_camera));
             }
             menus.add(cameraMenu);
         }
         if (PreferenceUtil.findPreference(this, R.string.pref_key_show_dir_download, true)) {
             if (downLoadMenu == null) {
-                downLoadMenu = new DrawerMenu(getString(R.string.menu_download), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+                downLoadMenu = new DrawerMenu(getString(R.string.menu_download), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), getResources().getDrawable(R.drawable.ic_action_download));
             }
             menus.add(downLoadMenu);
         }
@@ -136,7 +136,7 @@ public class MainActivity extends ActionBarActivity implements MenuAdapter.OnIte
         }
         menus.add(settingsMenu);
         if (helpMenu == null) {
-            helpMenu = new DrawerMenu(R.id.menu_about, getString(R.string.menu_help_feedback), null, getResources().getDrawable(R.drawable.ic_settings));
+            helpMenu = new DrawerMenu(R.id.menu_about, getString(R.string.menu_help_feedback), null, getResources().getDrawable(R.drawable.ic_action_about));
         }
         menus.add(helpMenu);
         menuAdapter.update(menus.toArray(new DrawerMenu[menus.size()]));

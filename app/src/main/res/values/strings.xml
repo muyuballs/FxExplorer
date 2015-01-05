@@ -52,4 +52,5 @@
     <string name="tip_pin_start_ok">%s has been fixed to the desktop</string>
     <string name="tip_rename_failed">rename fails</string>
     <string name="tip_cannt_show_multi_detail">details of multiple files can not be displayed</string>
+    <string name="pref_header_other">Other</string>
 </resources>

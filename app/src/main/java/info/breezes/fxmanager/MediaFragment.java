@@ -1,5 +1,6 @@
 package info.breezes.fxmanager;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -18,6 +19,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +66,7 @@ public class MediaFragment extends Fragment {
 
     private OnOpenFolderListener onOpenFolderListener;
 
+    private RecyclerView recyclerView;
     private DrawerMenu drawerMenu;
 
     private MediaAdapter mAdapter;
@@ -88,6 +91,7 @@ public class MediaFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         drawerMenu = (DrawerMenu) getArguments().getSerializable(ARG_DRAWER_MENU);
         if (savedInstanceState != null) {
             Log.d(null, "restore saved state ," + drawerMenu.path);
@@ -116,7 +120,7 @@ public class MediaFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_medias, container, false);
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter((mAdapter = new MediaAdapter(getActivity())));
@@ -171,9 +175,9 @@ public class MediaFragment extends Fragment {
                                     showItemDetailInfo();
                                 }
                             } else if (menuItem.getItemId() == R.id.action_delete) {
-                                deleteMediaItems(mAdapter.getSelectedItems().toArray(new MediaItem[0]));
+                                deleteMediaItems(mAdapter.getSelectedItems());
                             } else if (menuItem.getItemId() == R.id.action_zip) {
-                                compressMediaItems(mAdapter.getSelectedItems().toArray(new MediaItem[0]));
+                                compressMediaItems(mAdapter.getSelectedItems());
                             } else if (menuItem.getItemId() == R.id.action_rename) {
                                 renameMediaItem(mAdapter.getSelectedItems().get(0));
                             } else if (menuItem.getItemId() == R.id.action_add_bookmark) {
@@ -194,6 +198,20 @@ public class MediaFragment extends Fragment {
         });
         currentPath = drawerMenu.path;
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_media_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_refresh) {
+            reloadMediaList();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -220,7 +238,7 @@ public class MediaFragment extends Fragment {
         ;
     }
 
-    private void deleteMediaItems(final MediaItem... items) {
+    private void deleteMediaItems(final List<MediaItem> items) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(android.R.string.dialog_alert_title);
         builder.setMessage(getString(R.string.dialog_msg_are_you_confirm_delete_them));
@@ -229,7 +247,7 @@ public class MediaFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 int deleted = MediaItemUtil.delete(true, items);
                 if (deleted > 0) {
-                    if (deleted < items.length) {
+                    if (deleted < items.size()) {
                         Toast.showText(getActivity(), getString(R.string.tip_part_of_delete_ok));
                     } else {
                         Toast.showText(getActivity(), getString(R.string.tip_delete_ok));
@@ -245,6 +263,7 @@ public class MediaFragment extends Fragment {
     private void renameMediaItem(final MediaItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("");
+        @SuppressLint("InflateParams")
         View content = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_edit_content, null);
         final EditText editText = (EditText) content.findViewById(R.id.editText);
         editText.setText(item.title);
@@ -276,9 +295,10 @@ public class MediaFragment extends Fragment {
         dialog.show();
     }
 
-    private void compressMediaItems(final MediaItem... items) {
+    private void compressMediaItems(final List<MediaItem> items) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getString(R.string.dialog_title_tip));
+        @SuppressLint("InflateParams")
         View content = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_edit_content, null);
         final EditText editText = (EditText) content.findViewById(R.id.editText);
         editText.setHint(getString(R.string.hint_target_file_name));

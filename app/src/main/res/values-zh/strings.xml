@@ -51,4 +51,5 @@
     <string name="description_item_count">%d个项目</string>
     <string name="tip_no_read_permission">没有读取权限</string>
     <string name="tip_file_already_exists">文件已存在</string>
+    <string name="pref_header_other">其他</string>
 </resources>

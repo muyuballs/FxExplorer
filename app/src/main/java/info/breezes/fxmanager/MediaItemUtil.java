@@ -5,15 +5,12 @@ import android.os.AsyncTask;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.Channels;
+import java.util.List;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import info.breezes.ZIPUtil;
 import info.breezes.fxmanager.model.MediaItem;
 import info.breezes.toolkit.log.Log;
 
@@ -22,7 +19,7 @@ import info.breezes.toolkit.log.Log;
  * Created by Qiao on 2015/1/2.
  */
 public class MediaItemUtil {
-    public static int delete(boolean fall, MediaItem... items) {
+    public static int delete(boolean fall, List<MediaItem> items) {
         int deleted = 0;
         for (MediaItem item : items) {
             File file = new File(item.path);
@@ -39,7 +36,7 @@ public class MediaItemUtil {
         return file.renameTo(new File(file.getParent() + File.separator + newName));
     }
 
-    public static void compress(final String outFile, final OnProgressChangeListener listener, final MediaItem... items) {
+    public static void compress(final String outFile, final OnProgressChangeListener listener, final List<MediaItem> items) {
         new AsyncTask<Void, String, Boolean>() {
             @Override
             protected void onPreExecute() {
@@ -58,7 +55,7 @@ public class MediaItemUtil {
 
             @Override
             protected Boolean doInBackground(Void... params) {
-                FileOutputStream fos = null;
+                FileOutputStream fos;
                 try {
                     fos = new FileOutputStream(outFile);
                     ZipOutputStream zos = new ZipOutputStream(fos);
@@ -75,6 +72,7 @@ public class MediaItemUtil {
                 } catch (Exception e) {
                     File file = new File(outFile);
                     if (file.exists()) {
+                        //noinspection ResultOfMethodCallIgnored
                         file.delete();
                     }
                     Log.e(null, e.getMessage(), e);
@@ -107,7 +105,7 @@ public class MediaItemUtil {
                 FileInputStream inputStream = new FileInputStream(f);
                 try {
                     byte[] buf = new byte[1 << 20];
-                    int c = 0;
+                    int c;
                     while ((c = inputStream.read(buf)) != -1) {
                         if (c > 0) {
                             zos.write(buf, 0, c);
