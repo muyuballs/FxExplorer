@@ -28,11 +28,14 @@ public abstract class MediaProvider implements Serializable {
     public abstract List<MediaItem> loadMedia(String path, boolean showHidden);
 
     public abstract Drawable loadMediaIcon(MediaItem item);
+
     public abstract Drawable loadMediaBitmapIcon(MediaItem item);
 
     public abstract String getMimeType(MediaItem item);
 
-    public abstract Rect getImageSize(MediaItem item);
+    public Rect getImageSize(MediaItem item) {
+        return null;
+    }
 
     class IconCache extends LruCache<String, Drawable> {
         public IconCache(int maxSize) {

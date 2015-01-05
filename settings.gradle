@@ -1,1 +1,1 @@
-include ':app', ':viewer', ':editor', ':toolkit-release', ':player'
+include ':app', ':viewer', ':editor', ':toolkit-release', ':player', ':downloader'

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Dialog.DL" parent="Base.Theme.AppCompat.Dialog">
+        <item name="colorPrimaryDark">#0099CC</item>
+        <item name="colorPrimary">#33B5E5</item>
+        <item name="android:actionBarStyle">@style/ActionBar.DL</item>
+    </style>
+
+    <style name="ActionBar.DL" parent="Base.Widget.AppCompat.ActionBar">
+        <item name="android:background">?attr/colorPrimary</item>
+    </style>
+</resources>
