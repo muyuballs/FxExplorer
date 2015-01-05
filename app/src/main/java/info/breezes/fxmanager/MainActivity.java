@@ -1,14 +1,16 @@
 package info.breezes.fxmanager;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,14 +22,20 @@ import android.view.MenuItem;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
+import info.breezes.IntentUtils;
 import info.breezes.PreferenceUtil;
+import info.breezes.fxmanager.countly.CountlyActivity;
+import info.breezes.fxmanager.countly.CountlyEvent;
+import info.breezes.fxmanager.countly.CountlyUtils;
 import info.breezes.fxmanager.model.DrawerMenu;
 import info.breezes.toolkit.ui.LayoutViewHelper;
 import info.breezes.toolkit.ui.annotation.LayoutView;
 
 
-public class MainActivity extends ActionBarActivity implements MenuAdapter.OnItemClickListener, MediaFragment.OnOpenFolderListener {
+public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemClickListener, MediaFragment.OnOpenFolderListener {
 
     @LayoutView(R.id.rootView)
     private DrawerLayout rootView;
@@ -68,7 +76,12 @@ public class MainActivity extends ActionBarActivity implements MenuAdapter.OnIte
         menuList.setAdapter((menuAdapter = new MenuAdapter(this, null)));
         menuAdapter.setOnItemClickListener(this);
         viewPager.setAdapter((folderPagerAdapter = new FolderPagerAdapter(getSupportFragmentManager())));
-
+        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                getSupportActionBar().setSubtitle(getCurrentSelectedFragment().getCurrentRelativePath());
+            }
+        });
         sdMenu = new DrawerMenu(getString(R.string.menu_external_storage), Environment.getExternalStorageDirectory().getAbsolutePath(), getResources().getDrawable(R.drawable.ic_sd_storage));
 
         String title = getIntent().getStringExtra(MediaFragment.EXTRA_DIR_NAME);
@@ -80,6 +93,7 @@ public class MainActivity extends ActionBarActivity implements MenuAdapter.OnIte
         }
     }
 
+    @SuppressLint("NewApi")
     @Override
     protected void onResume() {
         super.onResume();
@@ -146,23 +160,36 @@ public class MainActivity extends ActionBarActivity implements MenuAdapter.OnIte
     public void onItemClick(DrawerMenu item) {
         switch (item.id) {
             case R.id.menu_about:
+                IntentUtils.sendMail(this, getString(R.string.feedback_email), getString(R.string.app_name));
                 return;
             case R.id.menu_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 return;
         }
         rootView.closeDrawer(Gravity.START);
-        getSupportActionBar().setSubtitle(item.path);
+        //getSupportActionBar().setSubtitle(item.path);
         openMedia(item);
     }
 
     private void openMedia(final DrawerMenu item) {
+        CountlyUtils.addEvent(CountlyEvent.OPEN, item.title);
         viewPager.setCurrentItem(folderPagerAdapter.addMedia(item));
+    }
+
+    private MediaFragment getCurrentSelectedFragment() {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        String pTitle = folderPagerAdapter.getPageTitle(viewPager.getCurrentItem()).toString();
+        for (Fragment f : fragments) {
+            if (f != null && pTitle.equals(((MediaFragment) f).getDrawerMenu().title)) {
+                return (MediaFragment) f;
+            }
+        }
+        return null;
     }
 
     @Override
     public void onBackPressed() {
-        MediaFragment fragment = (MediaFragment) getSupportFragmentManager().findFragmentById(R.id.viewPager);
+        MediaFragment fragment = getCurrentSelectedFragment();
         if (fragment != null) {
             if (!fragment.back()) {
                 if (folderPagerAdapter.getCount() > 1) {

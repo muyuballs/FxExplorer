@@ -5,14 +5,14 @@
             android:defaultValue="false"
             android:key="@string/pref_key_show_hidden"
             android:title="@string/pref_title_show_hide" />
-        <ListPreference
-            android:defaultValue="0"
-            android:entries="@array/pref_sort_list_titles"
-            android:entryValues="@array/pref_sort_list_values"
-            android:key="@string/pref_key_sort_type"
-            android:negativeButtonText="@string/button_negative"
-            android:positiveButtonText="@null"
-            android:title="@string/pref_title_sort_type" />
+        <!--  <ListPreference
+              android:defaultValue="0"
+              android:entries="@array/pref_sort_list_titles"
+              android:entryValues="@array/pref_sort_list_values"
+              android:key="@string/pref_key_sort_type"
+              android:negativeButtonText="@string/button_negative"
+              android:positiveButtonText="@null"
+              android:title="@string/pref_title_sort_type" />-->
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_header_dirs">
         <SwitchPreference

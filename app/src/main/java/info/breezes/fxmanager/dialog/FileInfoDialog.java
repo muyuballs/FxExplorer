@@ -20,6 +20,8 @@ import java.io.File;
 import info.breezes.ComputerUnitUtils;
 import info.breezes.fxmanager.MediaProvider;
 import info.breezes.fxmanager.R;
+import info.breezes.fxmanager.countly.CountlyEvent;
+import info.breezes.fxmanager.countly.CountlyUtils;
 import info.breezes.fxmanager.model.MediaItem;
 import info.breezes.toolkit.ui.Toast;
 
@@ -51,6 +53,7 @@ public class FileInfoDialog {
             builder.setNeutralButton(context.getString(R.string.show_hash_code), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    CountlyUtils.addEvent(CountlyEvent.SHOW_HASH, "");
                     new HashInfoDialog(context).showHashDialog(mediaItem);
                 }
             });

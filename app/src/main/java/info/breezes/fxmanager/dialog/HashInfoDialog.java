@@ -15,6 +15,8 @@ import android.widget.TextView;
 
 import info.breezes.DigestUtils;
 import info.breezes.fxmanager.R;
+import info.breezes.fxmanager.countly.CountlyEvent;
+import info.breezes.fxmanager.countly.CountlyUtils;
 import info.breezes.fxmanager.model.MediaItem;
 import info.breezes.toolkit.ui.Toast;
 
@@ -35,6 +37,7 @@ public class HashInfoDialog {
             TextView tv = (TextView) v;
             ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             clipboardManager.setPrimaryClip(ClipData.newPlainText(String.valueOf(tv.getTag()), tv.getText()));
+            CountlyUtils.addEvent(CountlyEvent.COPY_HASH, String.valueOf(tv.getTag()));
             Toast.showText(context, String.format(context.getString(R.string.tip_hash_copied), tv.getTag()));
         }
     };

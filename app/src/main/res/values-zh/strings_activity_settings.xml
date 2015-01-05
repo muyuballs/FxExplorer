@@ -1,0 +1,9 @@
+<resources>
+    <string-array name="pref_sort_list_titles">
+        <item>文件在前</item>
+        <item>文件夹在前</item>
+        <item>按照名称</item>
+        <item>按照最后修改时间</item>
+        <item>按照大小</item>
+    </string-array>
+</resources>

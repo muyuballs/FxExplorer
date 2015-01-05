@@ -3,14 +3,14 @@ package info.breezes.fxmanager;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import info.breezes.fxmanager.countly.CountlyActivity;
 import info.breezes.toolkit.ui.LayoutViewHelper;
 import info.breezes.toolkit.ui.annotation.LayoutView;
 
-public class SettingsActivity extends ActionBarActivity {
+public class SettingsActivity extends CountlyActivity {
 
     @LayoutView(R.id.toolbar)
     private Toolbar toolbar;

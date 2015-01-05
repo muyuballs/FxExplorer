@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
@@ -42,6 +41,9 @@ import java.util.concurrent.Executors;
 import info.breezes.ComputerUnitUtils;
 import info.breezes.PreferenceUtil;
 import info.breezes.fxmanager.android.app.QAlertDialog;
+import info.breezes.fxmanager.countly.CountlyEvent;
+import info.breezes.fxmanager.countly.CountlyFragment;
+import info.breezes.fxmanager.countly.CountlyUtils;
 import info.breezes.fxmanager.dialog.ApkInfoDialog;
 import info.breezes.fxmanager.dialog.FileInfoDialog;
 import info.breezes.fxmanager.model.DrawerMenu;
@@ -56,7 +58,7 @@ import info.breezes.toolkit.ui.Toast;
  * with a GridView.
  * <p/>
  */
-public class MediaFragment extends Fragment {
+public class MediaFragment extends CountlyFragment {
     private static final String ARG_DRAWER_MENU = "mediaItems";
     private static final String State_Path_Stack = "_path_stack_";
     public static final String EXTRA_INIT_DIR = "info.breezes.fx.extra.INIT_DIR";
@@ -99,6 +101,11 @@ public class MediaFragment extends Fragment {
         }
         if (paths == null) {
             paths = new Stack<>();
+        }
+        if (paths.empty()) {
+            currentPath = drawerMenu.path;
+        } else {
+            currentPath = paths.peek().path;
         }
         if (TextUtils.isEmpty(drawerMenu.mediaProvider)) {
             mediaProvider = new LocalFileSystemProvider(getActivity());
@@ -146,6 +153,7 @@ public class MediaFragment extends Fragment {
 
             @Override
             public boolean onItemLongClick(MediaItem item) {
+                CountlyUtils.addEvent(CountlyEvent.LONG_PRESS, "");
                 if (currentActionMode == null) {
                     ((ActionBarActivity) getActivity()).startSupportActionMode(new ActionMode.Callback() {
                         @Override
@@ -163,24 +171,30 @@ public class MediaFragment extends Fragment {
                         @Override
                         public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
                             if (menuItem.getItemId() == R.id.action_select_all) {
+                                CountlyUtils.addEvent(CountlyEvent.SELECT_ALL, "");
                                 if (mAdapter.getSelectedCount() != mAdapter.getItemCount()) {
                                     mAdapter.selectAll();
                                     actionMode.setTitle(String.format("%d", mAdapter.getSelectedCount()));
                                     reloadActionMenu();
                                 }
                             } else if (menuItem.getItemId() == R.id.action_detail) {
+                                CountlyUtils.addEvent(CountlyEvent.OPEN_DETAIL, "");
                                 if (mAdapter.getSelectedCount() > 1) {
                                     Toast.showText(getActivity(), getString(R.string.tip_cannt_show_multi_detail));
                                 } else {
                                     showItemDetailInfo();
                                 }
                             } else if (menuItem.getItemId() == R.id.action_delete) {
+                                CountlyUtils.addEvent(CountlyEvent.DELETE, "");
                                 deleteMediaItems(mAdapter.getSelectedItems());
                             } else if (menuItem.getItemId() == R.id.action_zip) {
+                                CountlyUtils.addEvent(CountlyEvent.COMPRESS, "");
                                 compressMediaItems(mAdapter.getSelectedItems());
                             } else if (menuItem.getItemId() == R.id.action_rename) {
+                                CountlyUtils.addEvent(CountlyEvent.RENAME, "");
                                 renameMediaItem(mAdapter.getSelectedItems().get(0));
                             } else if (menuItem.getItemId() == R.id.action_add_bookmark) {
+                                CountlyUtils.addEvent(CountlyEvent.PIN_START, "");
                                 pinToStart(mAdapter.getSelectedItems().get(0));
                             }
                             return true;
@@ -196,7 +210,6 @@ public class MediaFragment extends Fragment {
                 return false;
             }
         });
-        currentPath = drawerMenu.path;
         return view;
     }
 
@@ -208,6 +221,7 @@ public class MediaFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
+            CountlyUtils.addEvent(CountlyEvent.REFRESH, "");
             reloadMediaList();
             return true;
         }
@@ -395,7 +409,7 @@ public class MediaFragment extends Fragment {
 
     private void loadMediaFromPath(final String path) {
         if (onOpenFolderListener != null) {
-            onOpenFolderListener.onOpenFolder(path.replaceFirst(drawerMenu.path, ""));
+            onOpenFolderListener.onOpenFolder(getCurrentRelativePath());
         }
         new AsyncTask<Void, Void, Void>() {
             private List<MediaItem> mediaList;
@@ -405,12 +419,12 @@ public class MediaFragment extends Fragment {
             protected Void doInBackground(Void... params) {
                 try {
                     mediaList = mediaProvider.loadMedia(path, showHiddenFiles);
-                    Collections.sort(mediaList, new Comparator<MediaItem>() {
-                        @Override
-                        public int compare(MediaItem lhs, MediaItem rhs) {
-                            return lhs.type == rhs.type ? 0 : lhs.type == MediaItem.MediaType.Folder ? 1 : -1;
-                        }
-                    });
+//                    Collections.sort(mediaList, new Comparator<MediaItem>() {
+//                        @Override
+//                        public int compare(MediaItem lhs, MediaItem rhs) {
+//                            return lhs.type == rhs.type ? 0 : lhs.type == MediaItem.MediaType.Folder ? 1 : -1;
+//                        }
+//                    });
                 } catch (Exception exp) {
                     msg = exp.getMessage();
                 }
@@ -536,6 +550,15 @@ public class MediaFragment extends Fragment {
     public void onDetach() {
         this.onOpenFolderListener = null;
         super.onDetach();
+    }
+
+    public String getCurrentRelativePath() {
+        String path = currentPath.replaceFirst(drawerMenu.path, "");
+        if (TextUtils.isEmpty(path)) {
+            return "/";
+        } else {
+            return path;
+        }
     }
 
     class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaItemHolder> {

@@ -13,7 +13,7 @@
         android:title="@string/action_compress"
         android:icon="@drawable/ic_compress_dark"
         app:showAsAction="ifRoom" />
-    <item
+    <!--<item
         android:id="@+id/action_copy"
         android:icon="@drawable/ic_action_copy"
         android:orderInCategory="130"
@@ -24,7 +24,7 @@
         android:icon="@drawable/ic_action_cut"
         android:orderInCategory="140"
         android:title="@string/action_cut"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom" />-->
     <item
         android:id="@+id/action_select_all"
         android:icon="@drawable/ic_action_select_all"

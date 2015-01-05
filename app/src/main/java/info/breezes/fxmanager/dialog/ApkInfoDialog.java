@@ -19,6 +19,8 @@ import java.io.File;
 
 import info.breezes.ComputerUnitUtils;
 import info.breezes.fxmanager.R;
+import info.breezes.fxmanager.countly.CountlyEvent;
+import info.breezes.fxmanager.countly.CountlyUtils;
 import info.breezes.fxmanager.model.MediaItem;
 
 /**
@@ -55,6 +57,7 @@ public class ApkInfoDialog {
         builder.setPositiveButton(context.getString(R.string.btn_install), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                CountlyUtils.addEvent(CountlyEvent.INSTALL, "");
                 Intent intent = new Intent();
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.setAction(android.content.Intent.ACTION_VIEW);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="shell_path">
+    <string-array name="shell_path" translatable="false">
         <item>/sbin</item>
         <item>/vendor/bin</item>
         <item>/system/sbin</item>

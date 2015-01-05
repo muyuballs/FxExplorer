@@ -32,13 +32,13 @@
     <string name="menu_document">Document</string>
     <string name="menu_download">Download</string>
     <string name="menu_external_storage">External Storage</string>
-    <string name="menu_help_feedback">Help &amp; Feedback</string>
+    <string name="menu_help_feedback">Feedback</string>
     <string name="menu_movie">Movie</string>
     <string name="menu_music">Music</string>
     <string name="menu_picture">Picture</string>
     <string name="menu_root_directory">Root Directory</string>
     <string name="menu_settings">Settings</string>
-    <string name="description_item_count" formatted="false">%d items</string>
+    <string name="description_item_count">%1$d items</string>
     <string name="dialog_msg_are_you_confirm_delete_them">are you confirm to delete them ?</string>
     <string name="dialog_title_compressing">compressing</string>
     <string name="dialog_title_tip">Prompt</string>
@@ -50,27 +50,25 @@
     <string name="tip_file_name_cannt_null">new file name can not be empty</string>
     <string name="tip_no_read_permission">no read permission</string>
     <string name="tip_part_of_delete_ok">failed to delete some files</string>
-    <string name="tip_pin_start_ok" formatted="false">%s has been fixed to the desktop</string>
+    <string name="tip_pin_start_ok">%1$s has been fixed to the desktop</string>
     <string name="tip_rename_failed">rename fails</string>
     <string name="tip_cannt_show_multi_detail">details of multiple files can not be displayed</string>
     <string name="pref_header_other">Other</string>
-    <string name="apk_detail_installed" formatted="false">Installed (%s)</string>
+    <string name="apk_detail_installed">Installed (%1$s)</string>
     <string name="apk_detail_not_install">Not Installed</string>
     <string name="btn_install">INSTALL</string>
     <string name="contain">Contain:</string>
-    <string name="dialog_msg_folder_detial" formatted="false">%d files  %d folders</string>
+    <string name="dialog_msg_folder_detial">%1$d files  %2$d folders</string>
     <string name="install">Install:</string>
     <string name="last_modify_time">Last Modify Time:</string>
     <string name="package_name">Package Name:</string>
     <string name="show_hash_code">Show Hash Code</string>
     <string name="size">Size:</string>
     <string name="tip_click_copy_hash_code">Click Hash Code To Copy</string>
-    <string name="tip_hash_copied" formatted="false">%s copied</string>
-    <string name="tip_unknown_hash_method" formatted="false">Not Supported Hash Method( %s)</string>
+    <string name="tip_hash_copied">%1$s copied</string>
+    <string name="tip_unknown_hash_method">Not Supported Hash Method( %1$s)</string>
     <string name="type">Type:</string>
     <string name="unkown">Unknown</string>
     <string name="version">Version:</string>
-    <string name="title_activity_download">DownloadActivity</string>
-    <string name="hello_world">Hello world!</string>
 
 </resources>
