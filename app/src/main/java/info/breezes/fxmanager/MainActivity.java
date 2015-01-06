@@ -133,6 +133,7 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
         registerReceiver(mUsbReceiver, new IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED));
     }
 
+    @SuppressLint("NewApi")
     @Override
     protected void onResume() {
         super.onResume();

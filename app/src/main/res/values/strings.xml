@@ -66,9 +66,9 @@
     <string name="menu_sdcard">SDCard (%1$d)</string>
     <string name="menu_usb">USB Storage (%1$d)</string>
 <string name="title_activity_theme_chooser">Theme</string>
-    <string name="red">红</string>
-    <string name="blue">蓝</string>
-    <string name="purple">紫</string>
-    <string name="green">绿</string>
-    <string name="yellow">黄</string>
+    <string name="red">red</string>
+    <string name="blue">blue</string>
+    <string name="purple">purple</string>
+    <string name="green">green</string>
+    <string name="yellow">yellow</string>
 </resources>

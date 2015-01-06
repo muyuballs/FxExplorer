@@ -24,7 +24,7 @@ public class StorageTool {
     public static String[] getVolumes(StorageManager manager) {
         try {
             Method method = StorageManager.class.getMethod("getVolumePaths");
-            return (String[]) method.invoke(manager, null);
+            return (String[]) method.invoke(manager, (Object[])null);
         } catch (Exception e) {
             e.printStackTrace();
         }
