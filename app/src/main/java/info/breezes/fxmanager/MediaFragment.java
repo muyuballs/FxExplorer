@@ -81,6 +81,8 @@ public class MediaFragment extends CountlyFragment {
     private ActionMode currentActionMode;
 
     private boolean showHiddenFiles;
+    private boolean showRealPath;
+    private boolean showPath;
 
     public static MediaFragment newInstance(DrawerMenu drawerMenu) {
         MediaFragment fragment = new MediaFragment();
@@ -232,7 +234,14 @@ public class MediaFragment extends CountlyFragment {
     public void onResume() {
         super.onResume();
         showHiddenFiles = PreferenceUtil.findPreference(getActivity(), R.string.pref_key_show_hidden, false);
-        reloadMediaList();
+        showPath = PreferenceUtil.findPreference(getActivity(), R.string.pref_key_show_path_on_title, false);
+        showRealPath = PreferenceUtil.findPreference(getActivity(), R.string.pref_key_show_real_path, false);
+        recyclerView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                reloadMediaList();
+            }
+        },100);
     }
 
     private void pinToStart(MediaItem item) {
@@ -553,12 +562,18 @@ public class MediaFragment extends CountlyFragment {
     }
 
     public String getCurrentRelativePath() {
-        String path = currentPath.replaceFirst(drawerMenu.path, "");
-        if (TextUtils.isEmpty(path)) {
-            return "/";
-        } else {
-            return path;
+        if (showPath) {
+            String path = currentPath;
+            if (!showRealPath) {
+                path = path.replaceFirst(drawerMenu.path, "");
+            }
+            if (TextUtils.isEmpty(path)) {
+                return "/";
+            } else {
+                return path;
+            }
         }
+        return "";
     }
 
     class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaItemHolder> {

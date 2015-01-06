@@ -2,10 +2,16 @@ package info.breezes.fxmanager;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.storage.StorageManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -16,6 +22,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +39,7 @@ import info.breezes.fxmanager.countly.CountlyEvent;
 import info.breezes.fxmanager.countly.CountlyUtils;
 import info.breezes.fxmanager.model.DrawerMenu;
 import info.breezes.toolkit.ui.LayoutViewHelper;
+import info.breezes.toolkit.ui.Toast;
 import info.breezes.toolkit.ui.annotation.LayoutView;
 
 
@@ -50,6 +58,7 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
     private MenuAdapter menuAdapter;
     private FolderPagerAdapter folderPagerAdapter;
 
+    private ArrayList<DrawerMenu> sdMenus;
     private DrawerMenu sdMenu;
     private DrawerMenu rootDirMenu;
     private DrawerMenu picMenu;
@@ -60,6 +69,20 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
     private DrawerMenu downLoadMenu;
     private DrawerMenu settingsMenu;
     private DrawerMenu helpMenu;
+    private StorageManager storageManager;
+
+    BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+                UsbDevice device = (UsbDevice) intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                if (device != null) {
+
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,8 +105,24 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
                 getSupportActionBar().setSubtitle(getCurrentSelectedFragment().getCurrentRelativePath());
             }
         });
-        sdMenu = new DrawerMenu(getString(R.string.menu_external_storage), Environment.getExternalStorageDirectory().getAbsolutePath(), getResources().getDrawable(R.drawable.ic_sd_storage));
+        sdMenus = new ArrayList<>();
+        sdMenu = new DrawerMenu(getString(R.string.menu_external_storage), Environment.getExternalStorageDirectory().getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
+        storageManager = (android.os.storage.StorageManager) getSystemService(STORAGE_SERVICE);
 
+        String[] vols = StorageTool.getMountedVolumes(storageManager);
+        int usbIndex = 1;
+        int sdIndex = 1;
+        for (String v : vols) {
+            if (!sdMenu.path.startsWith(v)) {
+                if (v.contains("usb")) {
+                    DrawerMenu dm = new DrawerMenu(String.format(getString(R.string.menu_usb), usbIndex++), v, getResources().getDrawable(R.drawable.ic_usb));
+                    sdMenus.add(dm);
+                } else {
+                    DrawerMenu dm = new DrawerMenu(String.format(getString(R.string.menu_sdcard), sdIndex++), v, getResources().getDrawable(R.drawable.ic_sd_storage));
+                    sdMenus.add(dm);
+                }
+            }
+        }
         String title = getIntent().getStringExtra(MediaFragment.EXTRA_DIR_NAME);
         String path = getIntent().getStringExtra(MediaFragment.EXTRA_INIT_DIR);
         if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(path)) {
@@ -91,14 +130,15 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
         } else {
             openMedia(sdMenu);
         }
+        registerReceiver(mUsbReceiver, new IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED));
     }
 
-    @SuppressLint("NewApi")
     @Override
     protected void onResume() {
         super.onResume();
         ArrayList<DrawerMenu> menus = new ArrayList<>();
         menus.add(sdMenu);
+        menus.addAll(sdMenus);
         if (PreferenceUtil.findPreference(this, R.string.pref_key_show_root, false)) {
             if (rootDirMenu == null) {
                 rootDirMenu = new DrawerMenu(getString(R.string.menu_root_directory), "/", getResources().getDrawable(R.drawable.ic_storage));
@@ -157,7 +197,7 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
     }
 
     @Override
-    public void onItemClick(DrawerMenu item) {
+    public void onItemClick(final DrawerMenu item) {
         switch (item.id) {
             case R.id.menu_about:
                 IntentUtils.sendMail(this, getString(R.string.feedback_email), getString(R.string.app_name));
@@ -168,7 +208,12 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
         }
         rootView.closeDrawer(Gravity.START);
         //getSupportActionBar().setSubtitle(item.path);
-        openMedia(item);
+        viewPager.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                openMedia(item);
+            }
+        }, 100);
     }
 
     private void openMedia(final DrawerMenu item) {
@@ -219,6 +264,12 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         drawerToggle.syncState();
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(mUsbReceiver);
+        super.onDestroy();
     }
 
     @Override

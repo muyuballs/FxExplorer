@@ -70,5 +70,9 @@
     <string name="type">Type:</string>
     <string name="unkown">Unknown</string>
     <string name="version">Version:</string>
+    <string name="pref_title_show_path_on_title">Show path on title</string>
+    <string name="pref_title_show_real_path">Show real path</string>
+    <string name="menu_sdcard">SDCard (%1$d)</string>
+    <string name="menu_usb">USB Storage (%1$d)</string>
 
 </resources>

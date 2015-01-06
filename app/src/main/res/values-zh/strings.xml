@@ -68,4 +68,8 @@
     <string name="last_modify_time">修改时间:</string>
     <string name="contain">包含:</string>
     <string name="tip_click_copy_hash_code">点击hash值复制到剪贴板</string>
+    <string name="pref_title_show_path_on_title">在标题栏显示路径</string>
+    <string name="pref_title_show_real_path">显示真实路径</string>
+    <string name="menu_sdcard">SD卡 (%1$d)</string>
+    <string name="menu_usb">USB存储设备 (%1$d)</string>
 </resources>
