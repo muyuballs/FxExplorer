@@ -31,12 +31,21 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="info.breezes.fxmanager.MainActivity" />
         </activity>
-        <!-- countly open udid service-->
-        <service android:name="org.OpenUDID.OpenUDID_service">
+        <!-- countly open udid service -->
+        <service android:name="org.OpenUDID.OpenUDID_service" >
             <intent-filter>
                 <action android:name="org.OpenUDID.GETUDID" />
             </intent-filter>
         </service>
+
+        <activity
+            android:name=".ThemeChooserActivity"
+            android:label="@string/title_activity_theme_chooser"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="info.breezes.fxmanager.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

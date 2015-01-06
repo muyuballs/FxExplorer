@@ -20,14 +20,6 @@
     <string name="action_detail">Detail</string>
     <string name="action_bookmark">Pin To Start</string>
     <string name="hint_new_name">new name</string>
-    <string name="pref_title_show_download">Download</string>
-    <string name="pref_title_show_camera">Camera</string>
-    <string name="pref_title_show_document">Document</string>
-    <string name="pref_title_show_movie">Movie</string>
-    <string name="pref_title_show_music">Music</string>
-    <string name="pref_title_show_pic">Picture</string>
-    <string name="pref_header_dirs">Custom Directories</string>
-    <string name="pref_summary_show_root">Danger! if you are not very clear the contents of the directory "/" ，please do not turn it on</string>
     <string name="menu_camera">Camera</string>
     <string name="menu_document">Document</string>
     <string name="menu_download">Download</string>
@@ -70,9 +62,13 @@
     <string name="type">Type:</string>
     <string name="unkown">Unknown</string>
     <string name="version">Version:</string>
-    <string name="pref_title_show_path_on_title">Show path on title</string>
-    <string name="pref_title_show_real_path">Show real path</string>
+
     <string name="menu_sdcard">SDCard (%1$d)</string>
     <string name="menu_usb">USB Storage (%1$d)</string>
-
+<string name="title_activity_theme_chooser">Theme</string>
+    <string name="red">红</string>
+    <string name="blue">蓝</string>
+    <string name="purple">紫</string>
+    <string name="green">绿</string>
+    <string name="yellow">黄</string>
 </resources>

@@ -6,11 +6,27 @@
         <item>By Last Modify Date</item>
         <item>By Size</item>
     </string-array>
+
     <string-array name="pref_sort_list_values" translatable="false">
         <item>0</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>
         <item>4</item>
+    </string-array>
+
+    <string-array name="pref_theme_title" >
+        <item>Blue</item>
+        <item>Red</item>
+        <item>Green</item>
+        <item>Purple</item>
+        <item>Yellow</item>
+    </string-array>
+    <string-array name="pref_theme_values" translatable="false">
+        <item>blue</item>
+        <item>red</item>
+        <item>green</item>
+        <item>purple</item>
+        <item>yellow</item>
     </string-array>
 </resources>

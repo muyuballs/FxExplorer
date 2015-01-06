@@ -15,5 +15,9 @@ public enum CountlyEvent {
     OPEN_DETAIL,
     INSTALL,
     SHOW_HASH,
-    COPY_HASH, SELECT_ALL, DELETE, REFRESH,
+    COPY_HASH,
+    SELECT_ALL,
+    DELETE,
+    REFRESH,
+    CHANGE_THEME,
 }

@@ -1,15 +1,17 @@
 <resources>
+
     <style name="AppTheme" parent="Theme.AppCompat.Light">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primaryDark</item>
+
         <item name="windowActionModeOverlay">true</item>
         <item name="android:actionModeStyle">@style/ActionModeStyle</item>
     </style>
+
 
     <style name="ActionModeStyle">
         <item name="android:background">@color/actionModeBackground</item>
         <item name="actionOverflowMenuStyle">@style/MenuStyle</item>
     </style>
+
     <style name="MenuStyle">
         <item name="android:background">@android:color/white</item>
     </style>
@@ -23,5 +25,31 @@
         <item name="android:ellipsize">marquee</item>
         <item name="android:textSize">12sp</item>
         <item name="android:layout_width">match_parent</item>
+    </style>
+
+
+    <style name="AppTheme.Blue" parent="AppTheme.NoTitle">
+        <item name="colorPrimary">@color/primary_blue</item>
+        <item name="colorPrimaryDark">@color/primaryDark_blue</item>
+    </style>
+
+    <style name="AppTheme.Red" parent="AppTheme.NoTitle">
+        <item name="colorPrimary">@color/primary_red</item>
+        <item name="colorPrimaryDark">@color/primaryDark_red</item>
+    </style>
+
+    <style name="AppTheme.Green" parent="AppTheme.NoTitle">
+        <item name="colorPrimary">@color/primary_green</item>
+        <item name="colorPrimaryDark">@color/primaryDark_green</item>
+    </style>
+
+    <style name="AppTheme.Yellow" parent="AppTheme.NoTitle">
+        <item name="colorPrimary">@color/primary_yellow</item>
+        <item name="colorPrimaryDark">@color/primaryDark_yellow</item>
+    </style>
+
+    <style name="AppTheme.Purple" parent="AppTheme.NoTitle">
+        <item name="colorPrimary">@color/primary_purple</item>
+        <item name="colorPrimaryDark">@color/primaryDark_purple</item>
     </style>
 </resources>

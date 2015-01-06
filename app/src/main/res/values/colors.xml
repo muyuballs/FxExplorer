@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#33B5E5</color>
-    <color name="primaryDark">#0099CC</color>
+    <color name="primary_blue">#33b5e5</color>
+    <color name="primaryDark_blue">#0099cc</color>
+
+    <color name="primary_red">#ff4444</color>
+    <color name="primaryDark_red">#CC0000</color>
+
+    <color name="primary_green">#99cc00</color>
+    <color name="primaryDark_green">#669900</color>
+
+    <color name="primary_purple">#aa66cc</color>
+    <color name="primaryDark_purple">#9933cc</color>
+
+    <color name="primary_yellow">#FFBB33</color>
+    <color name="primaryDark_yellow">#FF8800</color>
+
     <color name="actionModeBackground">#ff7c7c7c</color>
     <drawable name="gray_dark">#ffdddbdb</drawable>
     <drawable name="transparent">#00ffffff</drawable>

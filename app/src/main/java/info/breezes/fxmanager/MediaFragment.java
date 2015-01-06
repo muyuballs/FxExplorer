@@ -97,12 +97,13 @@ public class MediaFragment extends CountlyFragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         drawerMenu = (DrawerMenu) getArguments().getSerializable(ARG_DRAWER_MENU);
+        paths = new Stack<>();
         if (savedInstanceState != null) {
             Log.d(null, "restore saved state ," + drawerMenu.path);
-            paths = (Stack<MediaItem>) savedInstanceState.getSerializable(State_Path_Stack);
-        }
-        if (paths == null) {
-            paths = new Stack<>();
+            List<MediaItem> savedPaths = (List<MediaItem>) savedInstanceState.getSerializable(State_Path_Stack);
+            if (savedPaths != null) {
+                paths.addAll(savedPaths);
+            }
         }
         if (paths.empty()) {
             currentPath = drawerMenu.path;

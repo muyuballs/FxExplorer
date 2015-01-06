@@ -11,4 +11,5 @@
     <string name="pref_key_sort_type" translatable="false">sort_type_list</string>
     <string name="pref_key_show_path_on_title" translatable="false">pref_key_show_path</string>
     <string name="pref_key_show_real_path" translatable="false">pref_key_show_real_path</string>
+    <string name="pref_key_theme">pref_key_theme</string>
 </resources>

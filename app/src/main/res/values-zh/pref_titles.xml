@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_header_dirs">个性化显示目录</string>
+    <string name="pref_title_show_camera">相机</string>
+    <string name="pref_title_show_document">文档</string>
+    <string name="pref_title_show_download">下载</string>
+    <string name="pref_title_show_movie">电影</string>
+    <string name="pref_title_show_music">音乐</string>
+    <string name="pref_title_show_pic">图片</string>
+    <string name="pref_summary_show_root">危险！除非你非常清楚 "/" 目录的具体内容，否则请勿打开此选项</string>
+    <string name="pref_title_show_path_on_title">在标题栏显示路径</string>
+    <string name="pref_title_show_real_path">显示真实路径</string>
+</resources>
