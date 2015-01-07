@@ -1,19 +1,22 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light">
-
         <item name="windowActionModeOverlay">true</item>
         <item name="android:actionModeStyle">@style/ActionModeStyle</item>
     </style>
 
 
     <style name="ActionModeStyle">
-        <item name="android:background">@color/actionModeBackground</item>
+        <item name="android:background">?attr/colorPrimary</item>
         <item name="actionOverflowMenuStyle">@style/MenuStyle</item>
     </style>
 
     <style name="MenuStyle">
         <item name="android:background">@android:color/white</item>
+    </style>
+
+    <style name="Dialog.NoTitle" parent="Base.Theme.AppCompat.Dialog">
+        <item name="android:windowNoTitle">true</item>
     </style>
 
     <style name="AppTheme.NoTitle" parent="AppTheme">

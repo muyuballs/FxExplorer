@@ -71,4 +71,5 @@
     <string name="purple">purple</string>
     <string name="green">green</string>
     <string name="yellow">yellow</string>
+    <string name="action_qrcode">QRCode</string>
 </resources>

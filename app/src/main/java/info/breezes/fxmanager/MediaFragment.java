@@ -3,10 +3,16 @@ package info.breezes.fxmanager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -25,7 +31,13 @@ import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,6 +60,7 @@ import info.breezes.fxmanager.dialog.ApkInfoDialog;
 import info.breezes.fxmanager.dialog.FileInfoDialog;
 import info.breezes.fxmanager.model.DrawerMenu;
 import info.breezes.fxmanager.model.MediaItem;
+import info.breezes.fxmanager.service.FileService;
 import info.breezes.toolkit.log.Log;
 import info.breezes.toolkit.ui.Toast;
 
@@ -199,6 +212,8 @@ public class MediaFragment extends CountlyFragment {
                             } else if (menuItem.getItemId() == R.id.action_add_bookmark) {
                                 CountlyUtils.addEvent(CountlyEvent.PIN_START, "");
                                 pinToStart(mAdapter.getSelectedItems().get(0));
+                            } else if (menuItem.getItemId() == R.id.action_qrcode) {
+                                showQrCode(mAdapter.getSelectedItems().get(0));
                             }
                             return true;
                         }
@@ -214,6 +229,56 @@ public class MediaFragment extends CountlyFragment {
             }
         });
         return view;
+    }
+
+    private void showQrCode(final MediaItem item) {
+        new AsyncTask<Void, Void, Void>() {
+            private Dialog dialog;
+            private ImageView imageView;
+
+            @Override
+            protected void onPreExecute() {
+                imageView = new ImageView(getActivity());
+                ProgressBar pd = new ProgressBar(getActivity());
+                pd.setIndeterminate(true);
+                dialog = new Dialog(getActivity(), R.style.Dialog_NoTitle);
+                dialog.setContentView(pd);
+                dialog.show();
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                dialog.setContentView(imageView);
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                String path = FileService.startServeFile(getActivity(), item.path, 5000);
+                try {
+                    QRCodeWriter writer = new QRCodeWriter();
+                    BitMatrix matrix = writer.encode(path, BarcodeFormat.QR_CODE, 512, 512);
+                    Bitmap bitmap = Bitmap.createBitmap(matrix.getWidth(), matrix.getHeight(), Bitmap.Config.RGB_565);
+                    Canvas canvas = new Canvas(bitmap);
+                    canvas.drawColor(Color.WHITE);
+                    Paint paint = new Paint();
+                    TypedArray array = getActivity().getTheme().obtainStyledAttributes(R.styleable.Theme);
+                    paint.setColor(array.getColor(R.styleable.Theme_colorPrimary, Color.BLACK));
+                    array.recycle();
+                    for (int i = 0; i < matrix.getHeight(); i++) {
+                        for (int x = 0; x < matrix.getWidth(); x++) {
+                            if (matrix.get(x, i)) {
+                                canvas.drawPoint(x, i, paint);
+                            }
+                        }
+                    }
+                    imageView.setImageBitmap(bitmap);
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }.executeOnExecutor(executor);
+
     }
 
     @Override
@@ -242,7 +307,7 @@ public class MediaFragment extends CountlyFragment {
             public void run() {
                 reloadMediaList();
             }
-        },100);
+        }, 100);
     }
 
     private void pinToStart(MediaItem item) {
