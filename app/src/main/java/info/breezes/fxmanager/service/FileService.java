@@ -145,7 +145,7 @@ public class FileService extends IntentService implements Handler {
 
     @Override
     public void handle(Request request, Response response) {
-        if (inService.contains(request.getPath())) {
+        if (contextMap.containsKey(request.getPath())) {
             String realPath = contextMap.get(request.getPath());
             File file = new File(realPath);
             if (file.isFile()) {

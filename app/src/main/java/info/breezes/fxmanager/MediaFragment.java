@@ -253,7 +253,7 @@ public class MediaFragment extends CountlyFragment {
 
             @Override
             protected Void doInBackground(Void... params) {
-                String path = FileService.startServeFile(getActivity(), item.path, 5000);
+                String path = FileService.startServeFile(getActivity(), item.path, 0);
                 try {
                     QRCodeWriter writer = new QRCodeWriter();
                     BitMatrix matrix = writer.encode(path, BarcodeFormat.QR_CODE, 512, 512);
