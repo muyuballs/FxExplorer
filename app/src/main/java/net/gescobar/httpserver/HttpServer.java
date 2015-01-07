@@ -106,7 +106,7 @@ public class HttpServer {
         running = true;
 
         serverSocket = new ServerSocket(port);
-        serverSocket.setSoTimeout(500);
+        serverSocket.setSoTimeout(0);
 
         serverDaemon = new ServerDaemon();
         if (background) {
