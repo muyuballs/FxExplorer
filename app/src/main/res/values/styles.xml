@@ -3,11 +3,11 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light">
         <item name="windowActionModeOverlay">true</item>
         <item name="android:actionModeStyle">@style/ActionModeStyle</item>
+        <item name="android:actionModeBackground">?attr/colorPrimary</item>
     </style>
 
 
-    <style name="ActionModeStyle">
-        <item name="android:background">?attr/colorPrimary</item>
+    <style name="ActionModeStyle" parent="Base.Widget.AppCompat.ActionMode">
         <item name="actionOverflowMenuStyle">@style/MenuStyle</item>
     </style>
 

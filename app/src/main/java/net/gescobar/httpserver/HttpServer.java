@@ -7,6 +7,7 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import info.breezes.StreamUtils;
 import info.breezes.toolkit.log.Log;
 
 public class HttpServer {
@@ -107,6 +108,7 @@ public class HttpServer {
 
         serverSocket = new ServerSocket(port);
         serverSocket.setSoTimeout(0);
+        Log.i(null, "<< HTTP Server running on port " + port + " >>");
 
         serverDaemon = new ServerDaemon();
         if (background) {
@@ -114,7 +116,7 @@ public class HttpServer {
         } else {
             serverDaemon.run();
         }
-        Log.i(null, "<< HTTP Server running on port " + port + " >>");
+
 
         return this;
 
@@ -128,7 +130,7 @@ public class HttpServer {
         // signals the daemon thread to stop the loop and terminate the execution.
         Log.d(null, "stopping the HTTP Server ... ");
         running = false;
-
+        StreamUtils.safeClose(serverSocket);
         // wait until it actually stops
         try {
             serverDaemon.join();
@@ -177,10 +179,6 @@ public class HttpServer {
 
     public void setHandler(Handler handler) {
         this.handler = handler;
-    }
-
-    public void setRunning(boolean running) {
-        this.running = running;
     }
 
 }

@@ -3,6 +3,8 @@ package info.breezes.fxmanager.service;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
+import android.util.Base64;
 
 import net.gescobar.httpserver.Handler;
 import net.gescobar.httpserver.HttpServer;
@@ -12,13 +14,13 @@ import net.gescobar.httpserver.Response;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
-import info.breezes.DigestUtils;
 import info.breezes.StreamUtils;
+import info.breezes.fxmanager.MimeTypeMap;
 import info.breezes.fxmanager.NetUtils;
 import info.breezes.toolkit.log.Log;
 
@@ -45,7 +47,7 @@ public class FileService extends IntentService implements Handler {
         intent.setAction(ACTION_SERVE_FILE);
         intent.putExtra(EXTRA_PATH, path);
         intent.putExtra(EXTRA_TIMEOUT, timeout);
-        intent.putExtra(EXTRA_CONTEXT, "/" + DigestUtils.sha1(path + System.nanoTime()));
+        intent.putExtra(EXTRA_CONTEXT, "/" + UUID.randomUUID().toString());
         context.startService(intent);
         return String.format("http://%s:10086%s", NetUtils.getLocalIpAddress(context), intent.getStringExtra(EXTRA_CONTEXT));
     }
@@ -57,22 +59,18 @@ public class FileService extends IntentService implements Handler {
         intent.putExtra(EXTRA_PATH, path);
         intent.putExtra(EXTRA_DIRS, dirs);
         intent.putExtra(EXTRA_TIMEOUT, timeout);
-        intent.putExtra(EXTRA_CONTEXT, "/" + DigestUtils.sha1(path + System.nanoTime()));
+        intent.putExtra(EXTRA_CONTEXT, "/" + Base64.encodeToString(path.getBytes(), Base64.URL_SAFE));
         context.startService(intent);
         return intent.getStringExtra(EXTRA_CONTEXT);
     }
 
-    private Timer timer;
-    private ArrayList<String> inService;
-    private HashMap<String, String> contextMap;
+    private static Timer timer = new Timer("TimeoutWatcher");
+    private static HashMap<String, String> contextMap = new HashMap<>();
 
-    private HttpServer httpServer;
+    private static HttpServer httpServer;
 
     public FileService() {
         super("FileService");
-        timer = new Timer("TimeoutWatcher");
-        inService = new ArrayList<>();
-        contextMap = new HashMap<>();
     }
 
     @Override
@@ -90,37 +88,35 @@ public class FileService extends IntentService implements Handler {
     }
 
     private void handleStopServe(String path) {
-        inService.remove(path);
+        String context = null;
+        for (String key : contextMap.keySet()) {
+            if (contextMap.get(key).equals(path)) {
+                context = key;
+                break;
+            }
+        }
+        if (context != null) {
+            contextMap.remove(context);
+        }
         checkState();
     }
 
-
     private void handleServeFile(String context, final String path, long timeout) {
-        inService.add(path);
         contextMap.put(context, path);
         setStopWatcher(timeout, path);
         startService();
     }
 
-
     private void handleServeFolder(String path, long timeout, boolean dirs) {
 
     }
 
-    private void setStopWatcher(long timeout, final String path) {
+    private void setStopWatcher(long timeout, final String context) {
         if (timeout > 0) {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    inService.remove(path);
-                    String context = null;
-                    for (String key : contextMap.keySet()) {
-                        if (contextMap.get(key).equals(path)) {
-                            context = key;
-                            break;
-                        }
-                    }
-                    if (context != null) {
+                    if (contextMap.containsKey(context)) {
                         contextMap.remove(context);
                     }
                     checkState();
@@ -129,13 +125,12 @@ public class FileService extends IntentService implements Handler {
         }
     }
 
-
     private synchronized void startService() {
         if (httpServer == null) {
             httpServer = new HttpServer(10086);
             httpServer.setHandler(this);
             try {
-                httpServer.start(false);
+                httpServer.start(true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -159,14 +154,18 @@ public class FileService extends IntentService implements Handler {
     }
 
     private void serveFile(Request request, Response response, File file) {
-        response = response.ok().contentType("application/octet-stream");
+        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(file.getPath()));
+        if (TextUtils.isEmpty(mimeType)) {
+            mimeType = "application/octet-stream";
+        }
+        response = response.ok().contentType(mimeType);
         response.addHeader("Content-Disposition", "attachment;filename=" + file.getName());
         response.addHeader("Content-Length", String.valueOf(file.length()));
         FileInputStream fileInputStream = null;
         try {
             response.writeHeader();
             fileInputStream = new FileInputStream(file);
-            byte[] buf = new byte[80960];
+            byte[] buf = new byte[8096];
             int c = -1;
             while ((c = fileInputStream.read(buf)) != -1) {
                 response.getOutputStream().write(buf, 0, c);
@@ -183,10 +182,10 @@ public class FileService extends IntentService implements Handler {
 
     }
 
-
     private synchronized void checkState() {
-        if (inService.size() < 1) {
-            httpServer.setRunning(false);
+        if (contextMap.size() < 1) {
+            httpServer.stop();
+            httpServer = null;
         }
     }
 

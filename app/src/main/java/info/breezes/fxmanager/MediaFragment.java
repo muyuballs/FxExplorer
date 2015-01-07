@@ -243,6 +243,12 @@ public class MediaFragment extends CountlyFragment {
                 pd.setIndeterminate(true);
                 dialog = new Dialog(getActivity(), R.style.Dialog_NoTitle);
                 dialog.setContentView(pd);
+                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        FileService.stopServe(getActivity(), item.path);
+                    }
+                });
                 dialog.show();
             }
 
