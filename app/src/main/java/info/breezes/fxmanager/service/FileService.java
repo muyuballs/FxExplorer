@@ -47,7 +47,7 @@ public class FileService extends IntentService implements Handler {
         intent.putExtra(EXTRA_TIMEOUT, timeout);
         intent.putExtra(EXTRA_CONTEXT, "/" + DigestUtils.sha1(path + System.nanoTime()));
         context.startService(intent);
-        return String.format("http://%s:10086/", NetUtils.getLocalIpAddress(context), intent.getStringExtra(EXTRA_CONTEXT));
+        return String.format("http://%s:10086%s", NetUtils.getLocalIpAddress(context), intent.getStringExtra(EXTRA_CONTEXT));
     }
 
 
