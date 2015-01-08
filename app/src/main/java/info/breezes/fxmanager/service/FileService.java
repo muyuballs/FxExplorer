@@ -165,7 +165,7 @@ public class FileService extends IntentService implements Handler {
         try {
             response.writeHeader();
             fileInputStream = new FileInputStream(file);
-            byte[] buf = new byte[8096];
+            byte[] buf = new byte[80960];
             int c = -1;
             while ((c = fileInputStream.read(buf)) != -1) {
                 response.getOutputStream().write(buf, 0, c);

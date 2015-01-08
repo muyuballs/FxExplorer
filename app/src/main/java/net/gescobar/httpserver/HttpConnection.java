@@ -1,6 +1,6 @@
 package net.gescobar.httpserver;
 
-import android.util.Log;
+import android.text.TextUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,6 +10,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+
+import info.breezes.toolkit.log.Log;
 
 /**
  * Handles an HTTP client connection. It parses the request creating an {@link net.gescobar.httpserver.Request} and a {@link net.gescobar.httpserver.Response}
@@ -97,7 +99,10 @@ public class HttpConnection implements Runnable {
         public RequestImpl(BufferedReader reader) throws IOException {
 
             String request = reader.readLine();
-
+            Log.d(null,request);
+            if(TextUtils.isEmpty(request)){
+                throw new IOException("cannot read request header");
+            }
             // get the method and the path
             method = request.split(" ")[0];
             path = request.split(" ")[1];

@@ -249,7 +249,9 @@ public class MediaFragment extends CountlyFragment {
                         FileService.stopServe(getActivity(), item.path);
                     }
                 });
-                dialog.show();
+                if (!getActivity().isFinishing()) {
+                    dialog.show();
+                }
             }
 
             @Override
