@@ -258,7 +258,12 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.action_scan) {
+            startActivity(new Intent(this, ScannerActivity.class));
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
