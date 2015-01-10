@@ -4,7 +4,7 @@
     tools:context=".MainActivity">
     <item
         android:id="@+id/action_scan"
-        android:icon="@drawable/ic_search"
+        android:icon="@drawable/ic_action_scan"
         android:orderInCategory="90"
         android:title="@string/action_search"
         app:showAsAction="ifRoom|collapseActionView" />
