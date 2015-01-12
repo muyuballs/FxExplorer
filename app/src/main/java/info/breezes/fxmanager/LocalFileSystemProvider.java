@@ -157,6 +157,7 @@ public class LocalFileSystemProvider extends MediaProvider {
 
     private Drawable getImageThumbnail(String imagePath, int width, int height) {
         Bitmap bitmap = ImageUtility.getImageWithFilePathAndSize(imagePath, width, height);
+
         bitmap = ThumbnailUtils.extractThumbnail(bitmap, width, height, ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
         return new BitmapDrawable(mContext.getResources(), bitmap);
     }

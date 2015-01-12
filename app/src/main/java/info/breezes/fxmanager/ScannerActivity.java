@@ -212,17 +212,20 @@ public class ScannerActivity extends CountlyActivity implements SurfaceHolder.Ca
                 Result result = decoder.decode(cropBitmap);
                 //cropBitmap.recycle();
                 if (result != null) {
-                    if (isSupportAutoFocus) {
-                        autoFocus.cancel();
-                    } else {
-                        handFocus.cancel();
-                    }
-                    Intent intent = new Intent();
-                    intent.putExtra(SCAN_STRING_RESULT, result.getText());
-                    intent.putExtra(SCAN_BINARY_RESULT, result.getRawBytes());
-                    intent.putExtra(SCAN_RESULT_FORMAT, result.getBarcodeFormat());
-                    setResult(Activity.RESULT_OK, intent);
-                    finish();
+                    Log.d(null, result.getBarcodeFormat() + "");
+                    Log.d(null, result.getResultMetadata().toString());
+                    Log.d(null, result.getText());
+//                    if (isSupportAutoFocus) {
+//                        autoFocus.cancel();
+//                    } else {
+//                        handFocus.cancel();
+//                    }
+//                    Intent intent = new Intent();
+//                    intent.putExtra(SCAN_STRING_RESULT, result.getText());
+//                    intent.putExtra(SCAN_BINARY_RESULT, result.getRawBytes());
+//                    intent.putExtra(SCAN_RESULT_FORMAT, result.getBarcodeFormat());
+//                    setResult(Activity.RESULT_OK, intent);
+//                    finish();
                 }
             }
             camera.startPreview();
@@ -230,7 +233,7 @@ public class ScannerActivity extends CountlyActivity implements SurfaceHolder.Ca
         }
 
         private int getSize(int i) {
-            return Math.round( i);
+            return Math.round(i);
         }
     }
 
