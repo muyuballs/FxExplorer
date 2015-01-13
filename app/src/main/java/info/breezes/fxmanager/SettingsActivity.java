@@ -14,21 +14,18 @@ import info.breezes.toolkit.ui.annotation.LayoutView;
 
 public class SettingsActivity extends CountlyActivity {
 
-    @LayoutView(R.id.toolbar)
-    private Toolbar toolbar;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         LayoutViewHelper.initLayout(this);
+        setupSupportActionBar();
         setupActionBar();
         getFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new GeneralPreferenceFragment()).commit();
     }
 
 
     private void setupActionBar() {
-        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 

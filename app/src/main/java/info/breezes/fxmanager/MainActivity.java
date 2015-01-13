@@ -1,7 +1,6 @@
 package info.breezes.fxmanager;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -20,9 +19,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,7 +27,6 @@ import android.view.MenuItem;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import info.breezes.IntentUtils;
 import info.breezes.PreferenceUtil;
@@ -39,7 +35,6 @@ import info.breezes.fxmanager.countly.CountlyEvent;
 import info.breezes.fxmanager.countly.CountlyUtils;
 import info.breezes.fxmanager.model.DrawerMenu;
 import info.breezes.toolkit.ui.LayoutViewHelper;
-import info.breezes.toolkit.ui.Toast;
 import info.breezes.toolkit.ui.annotation.LayoutView;
 
 
@@ -47,8 +42,6 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
 
     @LayoutView(R.id.rootView)
     private DrawerLayout rootView;
-    @LayoutView(R.id.toolbar)
-    private Toolbar toolbar;
     @LayoutView(R.id.menuList)
     private RecyclerView menuList;
     @LayoutView(R.id.viewPager)
@@ -89,8 +82,7 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         LayoutViewHelper.initLayout(this);
-        setSupportActionBar(toolbar);
-        toolbar.setSubtitleTextAppearance(this, R.style.SubTitle);
+        setupSupportActionBar();
         drawerToggle = new ActionBarDrawerToggle(this, rootView, toolbar, R.string.app_name, R.string.app_name);
         drawerToggle.setDrawerIndicatorEnabled(true);
         rootView.setDrawerListener(drawerToggle);
