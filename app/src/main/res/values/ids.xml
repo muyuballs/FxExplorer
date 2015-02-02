@@ -18,4 +18,5 @@
 <resources>
     <item name="menu_settings" type="id" />
     <item name="menu_about" type="id" />
+    <item name="toolbar" type="id" />
 </resources>

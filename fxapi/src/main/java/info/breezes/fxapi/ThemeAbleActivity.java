@@ -22,11 +22,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 
 import info.breezes.PreferenceUtil;
 
 public class ThemeAbleActivity extends ActionBarActivity {
     protected final static String ACTION_THEME_CHANGED = "info.breezes.fx.theme_changed";
+
+    protected Toolbar toolbar;
+
     private BroadcastReceiver themeChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -41,6 +45,12 @@ public class ThemeAbleActivity extends ActionBarActivity {
         setTheme(PreferenceUtil.findPreference(this, R.string.pref_key_theme, 0));
         super.onCreate(savedInstanceState);
         registerReceiver(themeChangeReceiver, new IntentFilter(ACTION_THEME_CHANGED));
+    }
+
+    protected  void setupSupportActionBar(){
+        toolbar= (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setSubtitleTextAppearance(this, R.style.SubTitle);
     }
 
     @Override

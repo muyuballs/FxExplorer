@@ -45,14 +45,13 @@ public class ThemeChooserActivity extends CountlyActivity {
 
     @LayoutView(R.id.recyclerView)
     private RecyclerView recyclerView;
-    @LayoutView(R.id.toolbar)
-    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_theme_chooser);
         LayoutViewHelper.initLayout(this);
+        setupSupportActionBar();
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         layoutManager.setOrientation(GridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
@@ -67,7 +66,6 @@ public class ThemeChooserActivity extends CountlyActivity {
     }
 
     private void setupActionBar() {
-        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 

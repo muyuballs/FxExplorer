@@ -1,23 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright 2015. Qiao
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="info.breezes.fxmanager"
     android:versionCode="2"
-    android:versionName="1.1.0">
+    android:versionName="1.1.0" >
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -34,26 +19,27 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme.NoTitle">
+        android:theme="@style/AppTheme.NoTitle" >
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:uiOptions="splitActionBarWhenNarrow">
+            android:uiOptions="splitActionBarWhenNarrow" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="info.breezes.fxmanager.MainActivity" />
         </activity>
         <!-- countly open udid service -->
-        <service android:name="org.OpenUDID.OpenUDID_service">
+        <service android:name="org.OpenUDID.OpenUDID_service" >
             <intent-filter>
                 <action android:name="org.OpenUDID.GETUDID" />
             </intent-filter>
@@ -62,7 +48,7 @@
         <activity
             android:name=".ThemeChooserActivity"
             android:label="@string/title_activity_theme_chooser"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="info.breezes.fxmanager.MainActivity" />
@@ -71,17 +57,18 @@
         <service
             android:name=".service.FileService"
             android:exported="false" />
-        <service
-            android:name=".service.ftp.FtpFileService"
-            android:exported="false" />
 
         <activity
             android:name=".ScannerActivity"
             android:label="@string/title_activity_scanner"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="info.breezes.fxmanager.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ScanResultActivity"
+            android:label="@string/dialog_title_tip" >
         </activity>
     </application>
 

@@ -1,19 +1,3 @@
-/*
- * Copyright 2015. Qiao
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package info.breezes.fxmanager;
 
 import android.app.Activity;
@@ -25,6 +9,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
@@ -44,7 +29,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import info.breezes.fxapi.countly.CountlyActivity;
+import info.breezes.IntentUtils;
+import info.breezes.fxmanager.countly.CountlyActivity;
 import info.breezes.fxmanager.qrcode.QrBitmapDecoder;
 import info.breezes.toolkit.log.Log;
 import info.breezes.toolkit.ui.LayoutViewHelper;
@@ -59,8 +45,7 @@ public class ScannerActivity extends CountlyActivity implements SurfaceHolder.Ca
 
     @LayoutView(R.id.surfaceView)
     private SurfaceView surfaceView;
-    @LayoutView(R.id.imageView2)
-    private ImageView imageView2;
+
     private SurfaceHolder surfaceHolder;
 
     private Camera camera;
@@ -74,8 +59,6 @@ public class ScannerActivity extends CountlyActivity implements SurfaceHolder.Ca
     private int catchWidth;
     private int catchHeight;
 
-    private Timer autoFocus;
-    private Timer handFocus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,8 +82,7 @@ public class ScannerActivity extends CountlyActivity implements SurfaceHolder.Ca
         parameters = camera.getParameters();
         DisplayMetrics metric = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metric);
-        if (metric.widthPixels < metric.heightPixels)// 横竖屏问题
-        {
+        if (metric.widthPixels < metric.heightPixels){
             camera.setDisplayOrientation(90);
         } else {
             camera.setDisplayOrientation(0);
@@ -121,19 +103,17 @@ public class ScannerActivity extends CountlyActivity implements SurfaceHolder.Ca
         } else {
             isSupportAutoFocus = false;
         }
-        parameters.setPreviewFormat(ImageFormat.NV21);                                //仅支持NV21
+        if (isSupportAutoFocus) {
+            autoFocusCallback = new AutoFocusCallBack();
+        }
+        parameters.setPreviewFormat(ImageFormat.NV21);
         camera.setParameters(parameters);
         previewCallback = new PreviewCallBack();
         camera.setPreviewCallback(previewCallback);
-        if (isSupportAutoFocus) {
-            autoFocusCallback = new AutoFocusCallBack();
-            autoFocus = new Timer();
-            autoFocus.schedule(new AutoFocusTimer(), 1000, 1500);        //自动对焦相机启动5秒后开始，每5秒对焦一次
-        } else {
-            handFocus = new Timer();
-            handFocus.schedule(new NotSupportAutoFocusTimer(), 1000, 1500);        //手动对焦相机启动3秒后开始，每3秒解析一次
-        }
+        startPreview();
+        camera.startPreview();
     }
+
 
     private void setBestPreviewSize(Point p, DisplayMetrics metric, Camera.Parameters parameters) {
         List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
@@ -164,12 +144,7 @@ public class ScannerActivity extends CountlyActivity implements SurfaceHolder.Ca
 
     @Override
     protected void onPause() {
-        if (autoFocus != null) {
-            autoFocus.cancel();
-        }
-        if (handFocus != null) {
-            handFocus.cancel();
-        }
+        stopPreview();
         if (camera != null) {
             camera.stopPreview();
             camera.release();
@@ -180,8 +155,10 @@ public class ScannerActivity extends CountlyActivity implements SurfaceHolder.Ca
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         try {
+            stopPreview();
             camera.setPreviewDisplay(holder);
             camera.startPreview();
+            startPreview();
         } catch (IOException e) {
             Log.e(null, "SurfaceCreated", e);
         }
@@ -199,18 +176,21 @@ public class ScannerActivity extends CountlyActivity implements SurfaceHolder.Ca
     class AutoFocusCallBack implements Camera.AutoFocusCallback {
         @Override
         public void onAutoFocus(boolean success, Camera camera) {
+            Log.d(null,"auto focus:"+success);
             focused = true;
         }
     }
 
     class PreviewCallBack implements Camera.PreviewCallback {
-        Rect rect = new Rect(0, 0, parameters.getPreviewSize().width, parameters.getPreviewSize().height);
 
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
+            Log.d(null,"preview frame");
             if (!focused) {
                 return;
             }
+            Rect rect = new Rect(0, 0, parameters.getPreviewSize().width, parameters.getPreviewSize().height);
+            camera.setPreviewCallback(null);
             YuvImage img = new YuvImage(data, ImageFormat.NV21, parameters.getPreviewSize().width, parameters.getPreviewSize().height, null);
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             if (img.compressToJpeg(rect, 100, byteArrayOutputStream)) {
@@ -218,31 +198,18 @@ public class ScannerActivity extends CountlyActivity implements SurfaceHolder.Ca
                 int borderSize = getSize(402);
                 Log.d(null, "BorderSize:" + borderSize);
                 final Bitmap cropBitmap = Bitmap.createBitmap(bm, (bm.getWidth() - borderSize) / 2, (bm.getHeight() - borderSize) / 2, borderSize, borderSize);
-                imageView2.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        imageView2.setImageBitmap(cropBitmap);
-                    }
-                });
                 bm.recycle();
                 Result result = decoder.decode(cropBitmap);
-                //cropBitmap.recycle();
+                cropBitmap.recycle();
                 if (result != null) {
-                    if (isSupportAutoFocus) {
-                        autoFocus.cancel();
-                    } else {
-                        handFocus.cancel();
-                    }
-                    Intent intent = new Intent();
-                    intent.putExtra(SCAN_STRING_RESULT, result.getText());
-                    intent.putExtra(SCAN_BINARY_RESULT, result.getRawBytes());
-                    intent.putExtra(SCAN_RESULT_FORMAT, result.getBarcodeFormat());
-                    setResult(Activity.RESULT_OK, intent);
-                    finish();
+                    stopPreview();
+                    showResultActivity(result.getText());
+                    return;
                 }
             }
-            camera.startPreview();
             focused = false;
+            camera.setPreviewCallback(previewCallback);
+            //camera.startPreview();
         }
 
         private int getSize(int i) {
@@ -250,18 +217,35 @@ public class ScannerActivity extends CountlyActivity implements SurfaceHolder.Ca
         }
     }
 
-    class AutoFocusTimer extends TimerTask {
+    private void showResultActivity(String text) {
+        Intent intent = new Intent(this, ScanResultActivity.class);
+        intent.putExtra(Intent.EXTRA_TEXT, text);
+        startActivity(intent);
+    }
+
+
+    private FocusTask focusTask;
+
+    private void startPreview() {
+        focusTask = new FocusTask();
+        surfaceView.postDelayed(focusTask, 1000);
+    }
+
+    private void stopPreview() {
+        surfaceView.removeCallbacks(focusTask);
+    }
+
+    class FocusTask implements Runnable {
         @Override
         public void run() {
-            Log.d("SCANNER", "autoFocus.");
-            camera.autoFocus(autoFocusCallback);
+            Log.d(null,"focus.");
+            if (isSupportAutoFocus) {
+                camera.autoFocus(autoFocusCallback);
+            } else {
+                focused = true;
+            }
+            surfaceView.postDelayed(focusTask, 1000);
         }
     }
 
-    class NotSupportAutoFocusTimer extends TimerTask {
-        @Override
-        public void run() {
-            focused = true;
-        }
-    }
 }
