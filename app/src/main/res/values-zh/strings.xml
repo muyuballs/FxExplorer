@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Qiao
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources>
     <string name="app_name">Fx文件浏览器</string>
     <string name="action_search">搜索</string>
@@ -62,11 +78,23 @@
     <string name="tip_click_copy_hash_code">点击hash值复制到剪贴板</string>
     <string name="menu_sdcard">SD卡 (%1$d)</string>
     <string name="menu_usb">USB存储设备 (%1$d)</string>
-    <string name="title_activity_theme_chooser">Theme</string>
+    <string name="title_activity_theme_chooser">主题</string>
     <string name="red">红</string>
     <string name="blue">蓝</string>
     <string name="purple">紫</string>
     <string name="green">绿</string>
     <string name="yellow">黄</string>
     <string name="pref_title_theme">主题</string>
+    <string name="uninstall">卸载</string>
+    <string name="action_qrcode">二维码</string>
+    <string name="hello_world">世界，你好</string>
+    <string name="menu_packages">应用程序</string>
+    <string name="title_activity_scanner">二维码扫描</string>
+    <string name="action_backup">备份</string>
+    <string name="action_send">发送</string>
+    <string name="downloaded">已下载</string>
+    <string name="system">系统</string>
+    <string name="system_update">系统 已更新</string>
+    <string name="apk_dia_type"><![CDATA[类    型:]]></string>
+    <string name="backup_result_tip">成功: %1$d ,失败: %2$d</string>
 </resources>

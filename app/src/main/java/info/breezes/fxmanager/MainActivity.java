@@ -1,7 +1,22 @@
+/*
+ * Copyright 2015. Qiao
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package info.breezes.fxmanager;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +37,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.SparseArray;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,16 +45,15 @@ import android.view.MenuItem;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import info.breezes.IntentUtils;
 import info.breezes.PreferenceUtil;
-import info.breezes.fxmanager.countly.CountlyActivity;
-import info.breezes.fxmanager.countly.CountlyEvent;
-import info.breezes.fxmanager.countly.CountlyUtils;
+import info.breezes.fxapi.MediaItemViewer;
+import info.breezes.fxapi.countly.CountlyActivity;
+import info.breezes.fxapi.countly.CountlyEvent;
+import info.breezes.fxapi.countly.CountlyUtils;
 import info.breezes.fxmanager.model.DrawerMenu;
 import info.breezes.toolkit.ui.LayoutViewHelper;
-import info.breezes.toolkit.ui.Toast;
 import info.breezes.toolkit.ui.annotation.LayoutView;
 
 
@@ -60,6 +74,7 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
 
     private ArrayList<DrawerMenu> sdMenus;
     private DrawerMenu sdMenu;
+    private DrawerMenu appMenu;
     private DrawerMenu rootDirMenu;
     private DrawerMenu picMenu;
     private DrawerMenu musicMenu;
@@ -69,16 +84,15 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
     private DrawerMenu downLoadMenu;
     private DrawerMenu settingsMenu;
     private DrawerMenu helpMenu;
-    private StorageManager storageManager;
 
     BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
             if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
-                UsbDevice device = (UsbDevice) intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 if (device != null) {
-
+                    Log.d("MA", device.toString() + " detached");
                 }
             }
         }
@@ -107,7 +121,7 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
         });
         sdMenus = new ArrayList<>();
         sdMenu = new DrawerMenu(getString(R.string.menu_external_storage), Environment.getExternalStorageDirectory().getAbsolutePath(), getResources().getDrawable(R.drawable.ic_storage));
-        storageManager = (android.os.storage.StorageManager) getSystemService(STORAGE_SERVICE);
+        StorageManager storageManager = (StorageManager) getSystemService(STORAGE_SERVICE);
 
         String[] vols = StorageTool.getMountedVolumes(storageManager);
         int usbIndex = 1;
@@ -123,8 +137,8 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
                 }
             }
         }
-        String title = getIntent().getStringExtra(MediaFragment.EXTRA_DIR_NAME);
-        String path = getIntent().getStringExtra(MediaFragment.EXTRA_INIT_DIR);
+        String title = getIntent().getStringExtra(MediaItemViewer.EXTRA_DIR_NAME);
+        String path = getIntent().getStringExtra(MediaItemViewer.EXTRA_INIT_DIR);
         if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(path)) {
             openMedia(new DrawerMenu(title, path));
         } else {
@@ -140,6 +154,12 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
         ArrayList<DrawerMenu> menus = new ArrayList<>();
         menus.add(sdMenu);
         menus.addAll(sdMenus);
+        if (PreferenceUtil.findPreference(this, R.string.pref_key_show_apps, true)) {
+            if (appMenu == null) {
+                appMenu = new DrawerMenu(-1, getString(R.string.menu_packages), getResources().getDrawable(R.drawable.ic_packages), "", "info.breezes.fxmanager.PackagesProvider");
+            }
+            menus.add(appMenu);
+        }
         if (PreferenceUtil.findPreference(this, R.string.pref_key_show_root, false)) {
             if (rootDirMenu == null) {
                 rootDirMenu = new DrawerMenu(getString(R.string.menu_root_directory), "/", getResources().getDrawable(R.drawable.ic_storage));
@@ -246,7 +266,6 @@ public class MainActivity extends CountlyActivity implements MenuAdapter.OnItemC
                 return;
             }
         }
-
         super.onBackPressed();
     }
 

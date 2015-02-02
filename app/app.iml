@@ -90,7 +90,11 @@
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="android-core-3.1.0" level="project" />
+    <orderEntry type="library" exported="" name="MockFtpServer-2.5" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-api-1.6.6" level="project" />
     <orderEntry type="library" exported="" name="toolkit-release-unspecified" level="project" />
+    <orderEntry type="module" module-name="fxapi" exported="" />
+    <orderEntry type="module" module-name="editor" exported="" />
   </component>
 </module>
 

@@ -1,24 +1,29 @@
+/*
+ * Copyright 2015. Qiao
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package info.breezes.fxmanager;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -29,20 +34,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,30 +47,19 @@ import java.util.concurrent.Executors;
 
 import info.breezes.ComputerUnitUtils;
 import info.breezes.PreferenceUtil;
-import info.breezes.fxmanager.android.app.QAlertDialog;
-import info.breezes.fxmanager.countly.CountlyEvent;
-import info.breezes.fxmanager.countly.CountlyFragment;
-import info.breezes.fxmanager.countly.CountlyUtils;
-import info.breezes.fxmanager.dialog.ApkInfoDialog;
-import info.breezes.fxmanager.dialog.FileInfoDialog;
+import info.breezes.fxapi.MediaItem;
+import info.breezes.fxapi.MediaItemViewer;
+import info.breezes.fxapi.MediaProvider;
+import info.breezes.fxapi.countly.CountlyEvent;
+import info.breezes.fxapi.countly.CountlyFragment;
+import info.breezes.fxapi.countly.CountlyUtils;
 import info.breezes.fxmanager.model.DrawerMenu;
-import info.breezes.fxmanager.model.MediaItem;
-import info.breezes.fxmanager.service.FileService;
 import info.breezes.toolkit.log.Log;
 import info.breezes.toolkit.ui.Toast;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Large screen devices (such as tablets) are supported by replacing the ListView
- * with a GridView.
- * <p/>
- */
-public class MediaFragment extends CountlyFragment {
+public class MediaFragment extends CountlyFragment implements ActionMode.Callback, MediaItemViewer {
     private static final String ARG_DRAWER_MENU = "mediaItems";
     private static final String State_Path_Stack = "_path_stack_";
-    public static final String EXTRA_INIT_DIR = "info.breezes.fx.extra.INIT_DIR";
-    public static final String EXTRA_DIR_NAME = "info.breezes.fx.extra.EXTRA_DIR_NAME";
 
     private static Executor executor = Executors.newFixedThreadPool(10);
 
@@ -96,6 +80,7 @@ public class MediaFragment extends CountlyFragment {
     private boolean showHiddenFiles;
     private boolean showRealPath;
     private boolean showPath;
+
 
     public static MediaFragment newInstance(DrawerMenu drawerMenu) {
         MediaFragment fragment = new MediaFragment();
@@ -144,8 +129,10 @@ public class MediaFragment extends CountlyFragment {
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_medias, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(layoutManager);
+        RecyclerView.LayoutManager gridManager = new GridLayoutManager(getActivity(), 4, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(gridManager);
+        //RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        //recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter((mAdapter = new MediaAdapter(getActivity())));
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
@@ -156,13 +143,13 @@ public class MediaFragment extends CountlyFragment {
                     if (mAdapter.getSelectedCount() < 1) {
                         currentActionMode.finish();
                     } else {
-                        reloadActionMenu();
+                        resetActionMenus();
                     }
                 } else {
                     if (item.type == MediaItem.MediaType.Folder) {
                         loadFileTree(item);
                     } else if (item.type == MediaItem.MediaType.File) {
-                        launch(item);
+                        mediaProvider.launch(getActivity(), item);
                     }
                 }
             }
@@ -171,137 +158,14 @@ public class MediaFragment extends CountlyFragment {
             public boolean onItemLongClick(MediaItem item) {
                 CountlyUtils.addEvent(CountlyEvent.LONG_PRESS, "");
                 if (currentActionMode == null) {
-                    ((ActionBarActivity) getActivity()).startSupportActionMode(new ActionMode.Callback() {
-                        @Override
-                        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-                            currentActionMode = actionMode;
-                            actionMode.getMenuInflater().inflate(R.menu.menu_single_item, menu);
-                            return true;
-                        }
-
-                        @Override
-                        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-                            return true;
-                        }
-
-                        @Override
-                        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-                            if (menuItem.getItemId() == R.id.action_select_all) {
-                                CountlyUtils.addEvent(CountlyEvent.SELECT_ALL, "");
-                                if (mAdapter.getSelectedCount() != mAdapter.getItemCount()) {
-                                    mAdapter.selectAll();
-                                    actionMode.setTitle(String.format("%d", mAdapter.getSelectedCount()));
-                                    reloadActionMenu();
-                                }
-                            } else if (menuItem.getItemId() == R.id.action_detail) {
-                                CountlyUtils.addEvent(CountlyEvent.OPEN_DETAIL, "");
-                                if (mAdapter.getSelectedCount() > 1) {
-                                    Toast.showText(getActivity(), getString(R.string.tip_cannt_show_multi_detail));
-                                } else {
-                                    showItemDetailInfo();
-                                }
-                            } else if (menuItem.getItemId() == R.id.action_delete) {
-                                CountlyUtils.addEvent(CountlyEvent.DELETE, "");
-                                deleteMediaItems(mAdapter.getSelectedItems());
-                            } else if (menuItem.getItemId() == R.id.action_zip) {
-                                CountlyUtils.addEvent(CountlyEvent.COMPRESS, "");
-                                compressMediaItems(mAdapter.getSelectedItems());
-                            } else if (menuItem.getItemId() == R.id.action_rename) {
-                                CountlyUtils.addEvent(CountlyEvent.RENAME, "");
-                                renameMediaItem(mAdapter.getSelectedItems().get(0));
-                            } else if (menuItem.getItemId() == R.id.action_add_bookmark) {
-                                CountlyUtils.addEvent(CountlyEvent.PIN_START, "");
-                                pinToStart(mAdapter.getSelectedItems().get(0));
-                            } else if (menuItem.getItemId() == R.id.action_qrcode) {
-                                showQrCode(mAdapter.getSelectedItems().get(0));
-                            }
-                            return true;
-                        }
-
-                        @Override
-                        public void onDestroyActionMode(ActionMode actionMode) {
-                            currentActionMode = null;
-                            mAdapter.clearSelection();
-                        }
-                    });
+                    mAdapter.setItemSelected(item, true);
+                    ((ActionBarActivity) getActivity()).startSupportActionMode(MediaFragment.this);
+                    return true;
                 }
                 return false;
             }
         });
         return view;
-    }
-
-    private void showQrCode(final MediaItem item) {
-        new AsyncTask<Void, Void, Void>() {
-            private Dialog dialog;
-            private ImageView imageView;
-
-            @Override
-            protected void onPreExecute() {
-                imageView = new ImageView(getActivity());
-                ProgressBar pd = new ProgressBar(getActivity());
-                pd.setIndeterminate(true);
-                dialog = new Dialog(getActivity(), R.style.Dialog_NoTitle);
-                dialog.setContentView(pd);
-                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        FileService.stopServe(getActivity(), item.path);
-                    }
-                });
-                if (!getActivity().isFinishing()) {
-                    dialog.show();
-                }
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                dialog.setContentView(imageView);
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                String path = FileService.startServeFile(getActivity(), item.path, 0);
-                try {
-                    QRCodeWriter writer = new QRCodeWriter();
-                    BitMatrix matrix = writer.encode(path, BarcodeFormat.QR_CODE, 512, 512);
-                    Bitmap bitmap = Bitmap.createBitmap(matrix.getWidth(), matrix.getHeight(), Bitmap.Config.RGB_565);
-                    Canvas canvas = new Canvas(bitmap);
-                    canvas.drawColor(Color.WHITE);
-                    Paint paint = new Paint();
-                    TypedArray array = getActivity().getTheme().obtainStyledAttributes(R.styleable.Theme);
-                    paint.setColor(array.getColor(R.styleable.Theme_colorPrimary, Color.BLACK));
-                    array.recycle();
-                    for (int i = 0; i < matrix.getHeight(); i++) {
-                        for (int x = 0; x < matrix.getWidth(); x++) {
-                            if (matrix.get(x, i)) {
-                                canvas.drawPoint(x, i, paint);
-                            }
-                        }
-                    }
-                    imageView.setImageBitmap(bitmap);
-                } catch (WriterException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        }.executeOnExecutor(executor);
-
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_media_fragment, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh) {
-            CountlyUtils.addEvent(CountlyEvent.REFRESH, "");
-            reloadMediaList();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -318,166 +182,118 @@ public class MediaFragment extends CountlyFragment {
         }, 100);
     }
 
-    private void pinToStart(MediaItem item) {
-        Intent shortcut = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
-        //快捷方式的名称
-        shortcut.putExtra(Intent.EXTRA_SHORTCUT_NAME, item.title);
-        shortcut.putExtra("duplicate", false); //不允许重复创建
-        Intent innerIntent = new Intent(getActivity(), MainActivity.class);
-        innerIntent.putExtra(EXTRA_INIT_DIR, item.path);
-        innerIntent.putExtra(EXTRA_DIR_NAME, item.title);
-        shortcut.putExtra(Intent.EXTRA_SHORTCUT_INTENT, innerIntent);
-        //快捷方式的图标
-        Intent.ShortcutIconResource icon = Intent.ShortcutIconResource.fromContext(getActivity(), R.drawable.ic_action_collection);
-        shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
-        getActivity().sendBroadcast(shortcut);
-        Toast.showText(getActivity(), String.format(getString(R.string.tip_pin_start_ok), item.title))
-        ;
+
+    /* implements from ActionMode.Callback */
+    @Override
+    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+        currentActionMode = actionMode;
+        return true;
     }
 
-    private void deleteMediaItems(final List<MediaItem> items) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(android.R.string.dialog_alert_title);
-        builder.setMessage(getString(R.string.dialog_msg_are_you_confirm_delete_them));
-        builder.setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                int deleted = MediaItemUtil.delete(true, items);
-                if (deleted > 0) {
-                    if (deleted < items.size()) {
-                        Toast.showText(getActivity(), getString(R.string.tip_part_of_delete_ok));
-                    } else {
-                        Toast.showText(getActivity(), getString(R.string.tip_delete_ok));
-                    }
-                    reloadMediaList();
-                }
-            }
-        });
-        builder.setPositiveButton(android.R.string.cancel, null);
-        builder.show();
+    @Override
+    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+        resetActionMenus();
+        currentActionMode.setTitle(String.valueOf(1));
+        return true;
     }
 
-    private void renameMediaItem(final MediaItem item) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("");
-        @SuppressLint("InflateParams")
-        View content = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_edit_content, null);
-        final EditText editText = (EditText) content.findViewById(R.id.editText);
-        editText.setText(item.title);
-        builder.setView(content);
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String newName = editText.getText().toString();
-                if (TextUtils.isEmpty(newName)) {
-                    Toast.showText(getActivity(), getString(R.string.tip_file_name_cannt_null));
-                    return;
-                }
-                dialog.dismiss();
-                if (MediaItemUtil.rename(item, newName)) {
-                    reloadMediaList();
-                } else {
-                    Toast.showText(getActivity(), getString(R.string.tip_rename_failed));
-                }
-            }
-        });
-        AlertDialog dialog = builder.create();
-        QAlertDialog.setAutoDismiss(dialog, false);
-        dialog.show();
+    @Override
+    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+        return mediaProvider.onActionItemClicked(getActivity(), this, menuItem);
     }
 
-    private void compressMediaItems(final List<MediaItem> items) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(getString(R.string.dialog_title_tip));
-        @SuppressLint("InflateParams")
-        View content = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_edit_content, null);
-        final EditText editText = (EditText) content.findViewById(R.id.editText);
-        editText.setHint(getString(R.string.hint_target_file_name));
-        builder.setView(content);
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String newName = editText.getText().toString();
-                if (TextUtils.isEmpty(newName)) {
-                    Toast.showText(getActivity(), getString(R.string.tip_file_name_cannt_null));
-                    return;
-                }
-                String out = currentPath + File.separator + newName;
-                if (!out.endsWith("\\.zip")) {
-                    out += ".zip";
-                }
-                File file = new File(out);
-                if (file.exists()) {
-                    Toast.showText(getActivity(), getString(R.string.tip_file_already_exists));
-                    return;
-                }
-                MediaItemUtil.compress(out, new MediaItemUtil.OnProgressChangeListener() {
-                    private ProgressDialog pd;
-
-                    @Override
-                    public void onPreExecute() {
-                        pd = new ProgressDialog(getActivity());
-                        pd.setCancelable(false);
-                        pd.setTitle(getString(R.string.dialog_title_compressing));
-                        pd.setIndeterminate(true);
-                        pd.show();
-                    }
-
-                    @Override
-                    public void onProgressChanged(String file, long max, long current) {
-                        pd.setMessage(file);
-                    }
-
-                    @Override
-                    public void onPostExecute(boolean success) {
-                        pd.dismiss();
-                        if (success) {
-                            Toast.showText(getActivity(), getString(R.string.tip_compress_ok));
-                            reloadMediaList();
-                        } else {
-                            Toast.showText(getActivity(), getString(R.string.tip_compress_failed));
-                        }
-                    }
-                }, items);
-                dialog.dismiss();
-            }
-        });
-        AlertDialog dialog = builder.create();
-        QAlertDialog.setAutoDismiss(dialog, false);
-        dialog.show();
+    @Override
+    public void onDestroyActionMode(ActionMode actionMode) {
+        actionMode.getMenu().clear();
+        currentActionMode = null;
+        mAdapter.clearSelection();
     }
+    /* end implement ActionMode.Callback*/
 
-    private void reloadActionMenu() {
-        if (currentActionMode != null) {
-            currentActionMode.getMenu().clear();
-            currentActionMode.getMenuInflater().inflate(mAdapter.getSelectedCount() > 1 ? R.menu.menu_mutil_item : R.menu.menu_single_item, currentActionMode.getMenu());
-            if (mAdapter.getSelectedItems().get(0).type == MediaItem.MediaType.File) {
-                MenuItem item = currentActionMode.getMenu().findItem(R.id.action_add_bookmark);
-                if (item != null) {
-                    item.setEnabled(false);
-                }
-            }
+    /* implements from MediaItemViewer */
+    @Override
+    public void setSelectAll() {
+        if (currentActionMode != null && mAdapter.getSelectedCount() != mAdapter.getItemCount()) {
+            mAdapter.selectAll();
+            currentActionMode.setTitle(String.format("%d", mAdapter.getSelectedCount()));
+            resetActionMenus();
         }
     }
 
-    private void reloadMediaList() {
+    @Override
+    public int getSelectedCount() {
+        return mAdapter.getSelectedCount();
+    }
+
+    @Override
+    public List<MediaItem> getSelectedItems() {
+        return mAdapter.getSelectedItems();
+    }
+
+    @Override
+    public void resetActionMenus() {
+        if (currentActionMode != null) {
+            currentActionMode.getMenu().clear();
+            mediaProvider.loadActionMenu(currentActionMode.getMenuInflater(), currentActionMode.getMenu(), mAdapter.getSelectedItems());
+        }
+    }
+
+    @Override
+    public void reloadMediaList() {
         if (currentActionMode != null) {
             currentActionMode.finish();
         }
         loadMediaFromPath(currentPath);
     }
+
+    @Override
+    public String getCurrentPath() {
+        return currentPath;
+    }
+
+    /* end implements MediaItemViewer */
+
+
+    private MenuItem listModeItem;
+    private MenuItem gridModeItem;
+    private LayoutMode layoutMode = LayoutMode.Grid;
+
+    enum LayoutMode {
+        List, Grid
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_media_fragment, menu);
+        listModeItem = menu.findItem(R.id.action_list_mode);
+        gridModeItem = menu.findItem(R.id.action_grid_mode);
+        gridModeItem.setVisible(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_refresh) {
+            CountlyUtils.addEvent(CountlyEvent.REFRESH, "");
+            reloadMediaList();
+            return true;
+        } else if (item.getItemId() == R.id.action_list_mode) {
+            layoutMode = LayoutMode.List;
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+            recyclerView.setLayoutManager(layoutManager);
+            listModeItem.setVisible(false);
+            gridModeItem.setVisible(true);
+            reloadMediaList();
+        } else if (item.getItemId() == R.id.action_grid_mode) {
+            layoutMode = LayoutMode.Grid;
+            RecyclerView.LayoutManager gridManager = new GridLayoutManager(getActivity(), 4, LinearLayoutManager.VERTICAL, false);
+            recyclerView.setLayoutManager(gridManager);
+            listModeItem.setVisible(true);
+            gridModeItem.setVisible(false);
+            reloadMediaList();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     private void loadRoot() {
         currentPath = drawerMenu.path;
@@ -583,40 +399,6 @@ public class MediaFragment extends CountlyFragment {
         }
     }
 
-    private void launch(MediaItem item) {
-        try {
-            String extension = MimeTypeMap.getFileExtensionFromUrl(item.path);
-            if ("apk".equalsIgnoreCase(extension)) {
-                ApkInfoDialog.showApkInfoDialog(getActivity(), item);
-            } else {
-                Intent intent = new Intent();
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.setAction(android.content.Intent.ACTION_VIEW);
-                Uri uri = Uri.fromFile(new File(item.path));
-                String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(item.path));
-                Log.d(null, "MimeType:" + mimeType);
-                intent.setDataAndType(uri, TextUtils.isEmpty(mimeType) ? "*/*" : mimeType);
-                startActivity(intent);
-            }
-        } catch (Exception exp) {
-            Toast.showText(getActivity(), exp.getMessage());
-        }
-    }
-
-    private void showItemDetailInfo() {
-        MediaItem mediaItem = mAdapter.getSelectedItems().get(0);
-        if (mediaItem.type == MediaItem.MediaType.File) {
-            String extension = MimeTypeMap.getFileExtensionFromUrl(mediaItem.path);
-            if ("apk".equalsIgnoreCase(extension)) {
-                ApkInfoDialog.showApkInfoDialog(getActivity(), mediaItem);
-            } else {
-                FileInfoDialog.showSingleFileInfoDialog(getActivity(), mediaItem, mediaProvider, true);
-            }
-        } else {
-            FileInfoDialog.showSingleFolderInfoDialog(getActivity(), mediaItem, mediaProvider);
-        }
-    }
-
     public DrawerMenu getDrawerMenu() {
         return drawerMenu;
     }
@@ -719,7 +501,7 @@ public class MediaFragment extends CountlyFragment {
 
         @Override
         public MediaItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(context).inflate(R.layout.media_item_list, parent, false);
+            View view = LayoutInflater.from(context).inflate(layoutMode == LayoutMode.Grid ? R.layout.media_item_grid : R.layout.media_item_list, parent, false);
             return new MediaItemHolder(view, this);
         }
 

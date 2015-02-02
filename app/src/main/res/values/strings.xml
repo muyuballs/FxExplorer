@@ -1,4 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2015. Qiao
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources>
 
     <string name="app_name">Fx Explorer</string>
@@ -73,5 +88,13 @@
     <string name="action_qrcode">QRCode</string>
     <string name="title_activity_scanner">ScannerActivity</string>
     <string name="hello_world">Hello world!</string>
-
+    <string name="uninstall">Uninstall</string>
+    <string name="menu_packages">Applications</string>
+    <string name="action_send">Send</string>
+    <string name="action_backup">Backup</string>
+    <string name="system">System</string>
+    <string name="system_update">System Updated</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="apk_dia_type">Type:</string>
+    <string name="backup_result_tip">success: %1$d ,failed: %2$d</string>
 </resources>
