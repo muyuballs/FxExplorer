@@ -20,13 +20,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.support.v4.app.NavUtils;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 
 import info.breezes.fxapi.countly.CountlyActivity;
 import info.breezes.toolkit.ui.LayoutViewHelper;
-import info.breezes.toolkit.ui.annotation.LayoutView;
 
 public class SettingsActivity extends CountlyActivity {
 

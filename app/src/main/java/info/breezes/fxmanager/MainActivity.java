@@ -30,9 +30,9 @@ import java.util.List;
 
 import info.breezes.IntentUtils;
 import info.breezes.PreferenceUtil;
-import info.breezes.fxmanager.countly.CountlyActivity;
-import info.breezes.fxmanager.countly.CountlyEvent;
-import info.breezes.fxmanager.countly.CountlyUtils;
+import info.breezes.fxapi.countly.CountlyActivity;
+import info.breezes.fxapi.countly.CountlyEvent;
+import info.breezes.fxapi.countly.CountlyUtils;
 import info.breezes.fxmanager.model.DrawerMenu;
 import info.breezes.toolkit.ui.LayoutViewHelper;
 import info.breezes.toolkit.ui.annotation.LayoutView;

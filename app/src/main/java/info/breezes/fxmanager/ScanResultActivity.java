@@ -1,13 +1,12 @@
 package info.breezes.fxmanager;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import info.breezes.fxmanager.countly.CountlyActivity;
+import info.breezes.fxapi.countly.CountlyActivity;
 import info.breezes.toolkit.ui.LayoutViewHelper;
 import info.breezes.toolkit.ui.annotation.LayoutView;
 

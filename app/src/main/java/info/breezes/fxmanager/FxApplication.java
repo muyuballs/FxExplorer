@@ -39,6 +39,6 @@ public class FxApplication extends Application {
         CountlyUtils.COUNTLY_ENABLE = true;
         Countly.sharedInstance().setLoggingEnabled(true);
         Countly.sharedInstance().init(this, "http://countly.breezes.info", "74ad07ed8b677d7e7d8516ff8a76cfb9b15586a4");
-        startService(new Intent(this, FtpFileService.class));
+        //startService(new Intent(this, FtpFileService.class));
     }
 }

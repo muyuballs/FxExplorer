@@ -55,7 +55,7 @@
         </activity>
 
         <service
-            android:name=".service.FileService"
+            android:name=".service.http.HttpFileService"
             android:exported="false" />
 
         <activity

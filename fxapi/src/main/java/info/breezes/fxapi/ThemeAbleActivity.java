@@ -50,7 +50,6 @@ public class ThemeAbleActivity extends ActionBarActivity {
     protected  void setupSupportActionBar(){
         toolbar= (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setSubtitleTextAppearance(this, R.style.SubTitle);
     }
 
     @Override

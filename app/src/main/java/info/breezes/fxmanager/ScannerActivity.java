@@ -30,7 +30,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import info.breezes.IntentUtils;
-import info.breezes.fxmanager.countly.CountlyActivity;
+import info.breezes.fxapi.countly.CountlyActivity;
 import info.breezes.fxmanager.qrcode.QrBitmapDecoder;
 import info.breezes.toolkit.log.Log;
 import info.breezes.toolkit.ui.LayoutViewHelper;
