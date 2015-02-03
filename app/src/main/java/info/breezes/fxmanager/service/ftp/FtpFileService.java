@@ -16,19 +16,18 @@
 
 package info.breezes.fxmanager.service.ftp;
 
-import android.app.IntentService;
-import android.content.Intent;
-
+import org.mockftpserver.core.command.CommandNames;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
 import org.mockftpserver.fake.filesystem.DirectoryEntry;
-import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 
+import java.io.File;
+
 import info.breezes.fxmanager.NetUtils;
+import info.breezes.fxmanager.StringUtils;
 import info.breezes.fxmanager.service.FileService;
-import info.breezes.toolkit.log.Log;
 
 
 public class FtpFileService extends FileService {
@@ -40,9 +39,10 @@ public class FtpFileService extends FileService {
         if (fakeFtpServer == null) {
             fakeFtpServer = new FakeFtpServer();
             fakeFtpServer.setServerControlPort(0);
+            fakeFtpServer.setCommandHandler(CommandNames.RETR,new RetrCommandHandler());
             fakeFtpServer.setFileSystem(new UnixFakeFileSystem());
             fakeFtpServer.start();
-            Log.d(null, NetUtils.getLocalIpAddress(this) + ":" + fakeFtpServer.getServerControlPort());
+            //Log.d(null, NetUtils.getLocalIpAddress(getApplicationContext()) + ":" + fakeFtpServer.getServerControlPort());
         }
     }
 
@@ -55,15 +55,29 @@ public class FtpFileService extends FileService {
 
     @Override
     protected void handleRemoveFile(String path) {
-
+        FileSystem fileSystem = fakeFtpServer.getFileSystem();
+        fileSystem.delete(path);
     }
 
     @Override
     protected void handleServeFile(String fs, String path, long timeout) {
-        FileSystem fileSystem=fakeFtpServer.getFileSystem();
-        String root="/";
-        UserAccount userAccount=new UserAccount("","",root);
-        FileEntry fileEntry=new FileEntry("");
+        FileSystem fileSystem = fakeFtpServer.getFileSystem();
+        String root = new File(path).getParent();
+        String userName = StringUtils.randomString(8);
+        String password = StringUtils.randomString(8);
+        UserAccount userAccount = new UserAccount(userName, password, root);
+        if (fileSystem.getEntry(root) == null) {
+            DirectoryEntry directoryEntry = new DirectoryEntry(root);
+            directoryEntry.setPermissionsFromString("r-xr-xr-x");
+            fileSystem.add(directoryEntry);
+        }
+        if (fileSystem.getEntry(path) == null) {
+            FxFileEntity fileEntry = new FxFileEntity(path);
+            fileSystem.add(fileEntry);
+        }
+        fakeFtpServer.addUserAccount(userAccount);
+        notifyServeApply("ftp", userName, password, NetUtils.getLocalIpAddress(this), fakeFtpServer.getServerControlPort(), path);
     }
+
 
 }

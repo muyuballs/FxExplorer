@@ -74,5 +74,6 @@
     <string name="title_activity_scanner">ScannerActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_scan_result">ScanResultActivity</string>
+    <string name="action_open_with_others">open ...</string>
 
 </resources>

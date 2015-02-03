@@ -16,37 +16,35 @@
 
 package info.breezes.fxmanager.service.ftp;
 
-import org.mockftpserver.fake.filesystem.AbstractFileSystemEntry;
 import org.mockftpserver.fake.filesystem.FileEntry;
-import org.mockftpserver.fake.filesystem.FileSystemEntry;
 
-import info.breezes.fxapi.MediaItem;
-import info.breezes.fxapi.MediaProvider;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
+import info.breezes.toolkit.log.Log;
 
 
-public class FxFileEntity extends AbstractFileSystemEntry {
-
-    private final MediaItem mediaItem;
-    private final MediaProvider mediaProvider;
-
-    public FxFileEntity(MediaItem item, MediaProvider provider) {
-        this.mediaItem = item;
-        this.mediaProvider = provider;
-        setPath(item.path);
-    }
-
-    @Override
-    public boolean isDirectory() {
-        return mediaItem.type == MediaItem.MediaType.Folder;
+public class FxFileEntity extends FileEntry {
+    public FxFileEntity(String path) {
+        super(path);
     }
 
     @Override
     public long getSize() {
-        return mediaItem.length;
+        return new File(getPath()).length();
     }
 
     @Override
-    public FileSystemEntry cloneWithNewPath(String path) {
-        return null;
+    public InputStream createInputStream() {
+        Log.d(null, "createInputStream");
+        try {
+            return new FileInputStream(getPath());
+        } catch (FileNotFoundException e) {
+            return super.createInputStream();
+        }
     }
+
+
 }

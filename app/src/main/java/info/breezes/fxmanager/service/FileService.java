@@ -19,58 +19,41 @@ package info.breezes.fxmanager.service;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.text.TextUtils;
-import android.util.Base64;
 
-import net.gescobar.httpserver.Handler;
-import net.gescobar.httpserver.HttpServer;
-import net.gescobar.httpserver.Request;
-import net.gescobar.httpserver.Response;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
-
-import info.breezes.StreamUtils;
-import info.breezes.fxmanager.MimeTypeMap;
-import info.breezes.fxmanager.NetUtils;
 import info.breezes.toolkit.log.Log;
 
-public abstract class FileService extends IntentService{
-
+public abstract class FileService extends IntentService {
+    public static final String PERMISSION_RECEIVE_SERVE_APPLE = "info.breezes.fxmanager.service.permission.RECEIVE_SERVE_APPLY";
     public static final String ACTION_STOP = "info.breezes.fxmanager.service.action.STOP";
     public static final String ACTION_REMOVE_FILE = "info.breezes.fxmanager.service.action.CLEAR";
     public static final String ACTION_ADD_FILE = "info.breezes.fxmanager.service.action.ADD_FILE";
+    public static final String ACTION_SERVE_APPLY = "info.breezes.fxmanager.service.action.SERVE_APPLY";
+
 
     public static final String EXTRA_PATH = "info.breezes.fxmanager.service.extra.PATH";
     public static final String EXTRA_FS_PROVIDER = "info.breezes.fxmanager.service.extra.FS_PROVIDER";
     public static final String EXTRA_TIMEOUT = "info.breezes.fxmanager.service.extra.TIMEOUT";
 
-    public static void stop(Context context) {
-        Intent intent = new Intent(context, FileService.class);
+    public static <T extends FileService> void stop(Context context, Class<T> theClass) {
+        Intent intent = new Intent(context, theClass);
         intent.setAction(ACTION_STOP);
         context.startService(intent);
     }
 
-    public static void removeFile(Context context, String path) {
-        Intent intent = new Intent(context, FileService.class);
+    public static <T extends FileService> void removeFile(Context context, String path, Class<T> theClass) {
+        Intent intent = new Intent(context, theClass);
         intent.setAction(ACTION_REMOVE_FILE);
         intent.putExtra(EXTRA_PATH, path);
         context.startService(intent);
     }
 
-    public static String startServeFile(Context context, String path, String fs, long timeout) {
-        Intent intent = new Intent(context, FileService.class);
+    public static <T extends FileService> void startServeFile(Context context, String path, String fs, long timeout, Class<T> theClass) {
+        Intent intent = new Intent(context, theClass);
         intent.setAction(ACTION_ADD_FILE);
         intent.putExtra(EXTRA_PATH, path);
         intent.putExtra(EXTRA_FS_PROVIDER, fs);
         intent.putExtra(EXTRA_TIMEOUT, timeout);
         context.startService(intent);
-        return "";
     }
 
     public FileService(String name) {
@@ -83,7 +66,7 @@ public abstract class FileService extends IntentService{
             final String action = intent.getAction();
             if (ACTION_ADD_FILE.equals(action)) {
                 handleServeFile(intent.getStringExtra(EXTRA_FS_PROVIDER), intent.getStringExtra(EXTRA_PATH), intent.getLongExtra(EXTRA_TIMEOUT, 0));
-            }  else if (ACTION_REMOVE_FILE.equals(action)) {
+            } else if (ACTION_REMOVE_FILE.equals(action)) {
                 handleRemoveFile(intent.getStringExtra(EXTRA_PATH));
             } else if (ACTION_STOP.equals(action)) {
                 handleStop();
@@ -91,7 +74,17 @@ public abstract class FileService extends IntentService{
         }
     }
 
+    protected void notifyServeApply(String protocol, String userName, String password, String ipAddress, int port, String path) {
+        Intent intent = new Intent(ACTION_SERVE_APPLY);
+        String url=String.format("%s://%s:%s@%s:%d%s", protocol, userName, password, ipAddress, port, path);
+        Log.d(null, url);
+        intent.putExtra(EXTRA_PATH,url);
+        sendBroadcast(intent, PERMISSION_RECEIVE_SERVE_APPLE);
+    }
+
     protected abstract void handleStop();
+
     protected abstract void handleRemoveFile(String path);
+
     protected abstract void handleServeFile(String fs, String path, long timeout);
 }

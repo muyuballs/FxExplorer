@@ -1,5 +1,8 @@
 package info.breezes.fxmanager;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,6 +11,7 @@ import android.widget.TextView;
 
 import info.breezes.fxapi.countly.CountlyActivity;
 import info.breezes.toolkit.ui.LayoutViewHelper;
+import info.breezes.toolkit.ui.Toast;
 import info.breezes.toolkit.ui.annotation.LayoutView;
 
 
@@ -15,6 +19,7 @@ public class ScanResultActivity extends CountlyActivity {
 
     @LayoutView(R.id.textView)
     private TextView textView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,7 +27,7 @@ public class ScanResultActivity extends CountlyActivity {
         LayoutViewHelper.initLayout(this);
         setupSupportActionBar();
         setupActionBar();
-        String text=getIntent().getStringExtra(Intent.EXTRA_TEXT);
+        String text = getIntent().getStringExtra(Intent.EXTRA_TEXT);
         textView.setText(text);
     }
 
@@ -45,7 +50,10 @@ public class ScanResultActivity extends CountlyActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_copy) {
+            ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboardManager.setPrimaryClip(ClipData.newPlainText("", textView.getText()));
+            Toast.showText(this, "已复制到剪贴板");
             return true;
         }
 

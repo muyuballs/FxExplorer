@@ -17,13 +17,16 @@
 package info.breezes.fxmanager;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -40,15 +43,20 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
+import android.text.TextPaint;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -59,8 +67,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import info.breezes.ComputerUnitUtils;
+import info.breezes.DensityUtils;
 import info.breezes.ImageUtility;
 import info.breezes.fxapi.MediaItem;
 import info.breezes.fxapi.MediaItemViewer;
@@ -71,6 +81,7 @@ import info.breezes.fxmanager.android.app.QAlertDialog;
 import info.breezes.fxmanager.dialog.ApkInfoDialog;
 import info.breezes.fxmanager.dialog.FileInfoDialog;
 import info.breezes.fxmanager.service.FileService;
+import info.breezes.fxmanager.service.ftp.FtpFileService;
 import info.breezes.toolkit.log.Log;
 import info.breezes.toolkit.ui.Toast;
 
@@ -384,19 +395,27 @@ public class LocalFileSystemProvider extends MediaProvider {
     private void showQrCode(final Activity activity, final MediaItem item) {
         new AsyncTask<Void, Void, Void>() {
             private Dialog dialog;
-            private ImageView imageView;
+            private String path;
+            private int primaryColor;
+            private Bitmap bitmap;
 
             @Override
             protected void onPreExecute() {
-                imageView = new ImageView(activity);
+                TypedArray array = activity.getTheme().obtainStyledAttributes(R.styleable.Theme);
+                primaryColor = array.getColor(R.styleable.Theme_colorPrimary, Color.BLACK);
+                array.recycle();
                 ProgressBar pd = new ProgressBar(activity);
                 pd.setIndeterminate(true);
                 dialog = new Dialog(activity, R.style.Dialog_NoTitle);
+                dialog.setCancelable(false);
                 dialog.setContentView(pd);
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        FileService.removeFile(activity, item.path);
+                        FileService.removeFile(activity, item.path, FtpFileService.class);
+                        if (bitmap != null) {
+                            bitmap.recycle();
+                        }
                     }
                 });
                 if (!activity.isFinishing()) {
@@ -406,33 +425,75 @@ public class LocalFileSystemProvider extends MediaProvider {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                dialog.setContentView(imageView);
+                if (TextUtils.isEmpty(path)) {
+                    dialog.dismiss();
+                } else {
+                    ViewGroup.LayoutParams params = new ActionBar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    LinearLayout layout = new LinearLayout(activity);
+                    layout.setBackgroundColor(Color.WHITE);
+                    layout.setLayoutParams(params);
+                    layout.setOrientation(LinearLayout.VERTICAL);
+                    ImageView imageView = new ImageView(activity);
+                    imageView.setImageBitmap(bitmap);
+                    layout.addView(imageView);
+                    TextView textView = new TextView(activity);
+                    textView.setGravity(Gravity.CENTER);
+                    textView.setTextColor(primaryColor);
+                    textView.setTextSize(DensityUtils.dp2px(activity, 6));
+                    textView.setText(path);
+                    layout.addView(textView);
+                    dialog.setContentView(layout);
+                    dialog.setCancelable(true);
+                }
             }
 
             @Override
-            protected Void doInBackground(Void... params) {
-//                String path = FileService.startServeFile(activity, item.path, 0);
-//                try {
-//                    QRCodeWriter writer = new QRCodeWriter();
-//                    BitMatrix matrix = writer.encode(path, BarcodeFormat.QR_CODE, 512, 512);
-//                    Bitmap bitmap = Bitmap.createBitmap(matrix.getWidth(), matrix.getHeight(), Bitmap.Config.RGB_565);
-//                    Canvas canvas = new Canvas(bitmap);
-//                    canvas.drawColor(Color.WHITE);
-//                    Paint paint = new Paint();
-//                    TypedArray array = activity.getTheme().obtainStyledAttributes(R.styleable.Theme);
-//                    paint.setColor(array.getColor(R.styleable.Theme_colorPrimary, Color.BLACK));
-//                    array.recycle();
-//                    for (int i = 0; i < matrix.getHeight(); i++) {
-//                        for (int x = 0; x < matrix.getWidth(); x++) {
-//                            if (matrix.get(x, i)) {
-//                                canvas.drawPoint(x, i, paint);
-//                            }
-//                        }
-//                    }
-//                    imageView.setImageBitmap(bitmap);
-//                } catch (WriterException e) {
-//                    e.printStackTrace();
-//                }
+            protected Void doInBackground(final Void... params) {
+                BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(final Context context, final Intent intent) {
+                        Log.d(null, "BD:" + this.hashCode());
+                        if (FileService.ACTION_SERVE_APPLY.equals(intent.getAction())) {
+                            path = intent.getStringExtra(FileService.EXTRA_PATH);
+                        }
+                    }
+                };
+                activity.registerReceiver(broadcastReceiver, new IntentFilter(FileService.ACTION_SERVE_APPLY), FileService.PERMISSION_RECEIVE_SERVE_APPLE, null);
+                FileService.startServeFile(activity, item.path, "", 0, FtpFileService.class);
+                long st = System.currentTimeMillis();
+                while (TextUtils.isEmpty(path) && (System.currentTimeMillis() - st) < 2000) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        break;
+                    }
+                }
+                activity.unregisterReceiver(broadcastReceiver);
+                if (TextUtils.isEmpty(path)) {
+                    FileService.removeFile(activity, item.path, FtpFileService.class);
+                    Toast.showText(activity, "time out");
+                    return null;
+                }
+                try {
+
+                    QRCodeWriter writer = new QRCodeWriter();
+                    BitMatrix matrix = writer.encode(path, BarcodeFormat.QR_CODE, 512, 512);
+                    bitmap = Bitmap.createBitmap(matrix.getWidth(), matrix.getHeight(), Bitmap.Config.RGB_565);
+                    Canvas canvas = new Canvas(bitmap);
+                    canvas.drawColor(Color.WHITE);
+                    Paint paint = new Paint();
+                    paint.setColor(primaryColor);
+                    for (int i = 0; i < matrix.getHeight(); i++) {
+                        for (int x = 0; x < matrix.getWidth(); x++) {
+                            if (matrix.get(x, i)) {
+                                canvas.drawPoint(x, i, paint);
+                            }
+                        }
+                    }
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                }
                 return null;
             }
         }.execute();
